@@ -11,7 +11,7 @@ public class Finch {
     }
 
     //Array to store tasks
-    private static final String[] tasks = new String[100];
+    private static final Task[] tasks = new Task[100];
 
     //Counter for the number of tasks
     private static int taskCount = 0;
@@ -41,6 +41,10 @@ public class Finch {
                 break;
             } else if (userInput.equalsIgnoreCase("list")) {
                 listTasks();
+            } else if (userInput.startsWith("mark ")) {
+                markTask(userInput);
+            } else if (userInput.startsWith("unmark ")) {
+                unmarkTask(userInput);
             } else {
                 addTask(userInput);
             }
@@ -52,11 +56,11 @@ public class Finch {
     }
 
     //Method to add task
-    private static void addTask(String task) {
+    private static void addTask(String taskDescription) {
         if (taskCount < tasks.length) {
-            tasks[taskCount] = task;
+            tasks[taskCount] = new Task(taskDescription);
             taskCount++;
-            System.out.println("    Added task: " + task);
+            System.out.println("    Added task: " + taskDescription);
         } else {
             System.out.println("    Task list is full!");
         }
@@ -65,10 +69,38 @@ public class Finch {
 
     //Method to list all tasks
     private static void listTasks() {
-        System.out.println("    Here are your tasks:");
+        System.out.println("    Here are your tasks in your list:");
         for (int i = 0; i < taskCount; i++) {
             System.out.println("    "  + (i + 1) + ". " + tasks[i]);
         }
         line();
+    }
+
+    //Method to mark task
+    private static void markTask(String userInput) {
+        int taskIndex = Integer.parseInt(userInput.split(" ")[1]) - 1;
+        if (taskIndex >= 0 && taskIndex < taskCount) {
+            tasks[taskIndex].markAsDone();
+            System.out.println("    Nice! I've marked this task as done:");
+            System.out.println("    " + tasks[taskIndex]);
+            line();
+        } else {
+            System.out.println("    Task not found.");
+            line();
+        }
+    }
+
+    //Method to unmark task
+    private static void unmarkTask(String userInput) {
+        int taskIndex = Integer.parseInt(userInput.split(" ")[1]) - 1;
+        if (taskIndex >= 0 && taskIndex < taskCount) {
+            tasks[taskIndex].unmark();
+            System.out.println("    OK, I've marked this task as not done yet:");
+            System.out.println("    " + tasks[taskIndex]);
+            line();
+        } else {
+            System.out.println("    Task not found.");
+            line();
+        }
     }
 }
