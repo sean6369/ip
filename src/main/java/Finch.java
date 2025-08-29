@@ -71,7 +71,7 @@ public class Finch {
     private static void listTasks() {
         System.out.println("    Here are your tasks in your list:");
         for (int i = 0; i < taskCount; i++) {
-            System.out.println("    "  + (i + 1) + ". " + tasks[i]);
+            System.out.println("    " + (i + 1) + ". " + tasks[i]);
         }
         line();
     }
