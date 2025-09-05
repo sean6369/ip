@@ -26,7 +26,7 @@ public class Finch {
                 ██╔══╝  ██║██║╚██╗██║██║     ██╔══██║
                 ██║     ██║██║ ╚████║╚██████╗██║  ██║
                 ╚═╝     ╚═╝╚═╝  ╚═══╝ ╚═════╝╚═╝  ╚═╝
-                                                    \s""");
+        """.stripTrailing());
         printHorizontalLine();
         System.out.println("    Hello! I'm " + NAME);
         System.out.println("    What can I do for you?");
@@ -85,7 +85,6 @@ public class Finch {
         taskCount++;
         System.out.println("    Now you have " + taskCount + " tasks in the list");
         printHorizontalLine();
-        System.out.println();
     }
 
     // Method to add todo
