@@ -34,45 +34,60 @@ public class Finch {
 
         String userInput;
         while (true) {
-            userInput = scanner.nextLine();
-            printHorizontalLine();
-            String command = userInput.split(" ")[0]; // Extract the command (first word)
+            try {
+                userInput = scanner.nextLine();
 
-            switch (command.toLowerCase()) {
-            case "bye":
-                System.out.println("    Bye. Hope to see you again soon!");
+                // Handle empty input
+                if (userInput == null || userInput.trim().isEmpty()) {
+                    printHorizontalLine();
+                    System.out.println("    Please enter a command!");
+                    printHorizontalLine();
+                    continue;
+                }
                 printHorizontalLine();
-                scanner.close();
-                return; // Exit program
+                String[] inputParts = userInput.trim().split("\\s+"); // Splits the command by spaces (multiple spaces handled as well)
+                String command = inputParts[0]; // Gets the first command word
 
-            case "list":
-                listTasks();
-                break;
+                switch (command.toLowerCase()) {
+                case "bye":
+                    System.out.println("    Bye. Hope to see you again soon!");
+                    printHorizontalLine();
+                    scanner.close();
+                    return; // Exit program
 
-            case "mark":
-                markTask(userInput);
-                break;
+                case "list":
+                    listTasks();
+                    break;
 
-            case "unmark":
-                unmarkTask(userInput);
-                break;
+                case "mark":
+                    markTask(userInput);
+                    break;
 
-            case "todo":
-                addToDo(userInput);
-                break;
+                case "unmark":
+                    unmarkTask(userInput);
+                    break;
 
-            case "deadline":
-                addDeadline(userInput);
-                break;
+                case "todo":
+                    addToDo(userInput);
+                    break;
 
-            case "event":
-                addEvent(userInput);
-                break;
+                case "deadline":
+                    addDeadline(userInput);
+                    break;
 
-            default:
-                System.out.println("    Invalid command!");
+                case "event":
+                    addEvent(userInput);
+                    break;
+
+                default:
+                    System.out.println("    Sorry, I don’t recognize that command!");
+                    System.out.println("    Available commands: list, todo, deadline, event, mark, unmark, bye");
+                    printHorizontalLine();
+                    break;
+                }
+            } catch (Exception e) {
+                System.out.println("    OOPS!!! Something went wrong: " + e.getMessage());
                 printHorizontalLine();
-                break;
             }
         }
     }
