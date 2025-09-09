@@ -20,13 +20,13 @@ public class Finch {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("""
-                ███████╗██╗███╗   ██╗ ██████╗██╗  ██╗
-                ██╔════╝██║████╗  ██║██╔════╝██║  ██║
-                █████╗  ██║██╔██╗ ██║██║     ███████║
-                ██╔══╝  ██║██║╚██╗██║██║     ██╔══██║
-                ██║     ██║██║ ╚████║╚██████╗██║  ██║
-                ╚═╝     ╚═╝╚═╝  ╚═══╝ ╚═════╝╚═╝  ╚═╝
-        """.stripTrailing());
+                        ███████╗██╗███╗   ██╗ ██████╗██╗  ██╗
+                        ██╔════╝██║████╗  ██║██╔════╝██║  ██║
+                        █████╗  ██║██╔██╗ ██║██║     ███████║
+                        ██╔══╝  ██║██║╚██╗██║██║     ██╔══██║
+                        ██║     ██║██║ ╚████║╚██████╗██║  ██║
+                        ╚═╝     ╚═╝╚═╝  ╚═══╝ ╚═════╝╚═╝  ╚═╝
+                """.stripTrailing());
         printHorizontalLine();
         System.out.println("    Hello! I'm " + NAME);
         System.out.println("    What can I do for you?");
@@ -148,28 +148,67 @@ public class Finch {
 
     //Method to mark task
     private static void markTask(String userInput) {
-        int taskIndex = Integer.parseInt(userInput.split(" ")[1]) - 1;
-        if (taskIndex >= 0 && taskIndex < taskCount) {
+        try {
+            String[] parts = userInput.trim().split("\\s+");
+
+            // Check if user provided a task number
+            if (parts.length < 2) {
+                System.out.println("    Please provide the task number to mark!");
+                printHorizontalLine();
+                return;
+            }
+
+            // Try converting to integer
+            int taskIndex = Integer.parseInt(parts[1]) - 1;
+
+            // Check if the number is valid
+            if (taskIndex < 0 || taskIndex >= taskCount) {
+                System.out.println("    Task number " + (taskIndex + 1) + " does not exist!");
+                printHorizontalLine();
+                return;
+            }
+
+            // Mark as done
             tasks[taskIndex].markAsDone();
             System.out.println("    Nice! I've marked this task as done:");
             System.out.println("    " + tasks[taskIndex]);
             printHorizontalLine();
-        } else {
-            System.out.println("    Task not found.");
+
+        } catch (NumberFormatException e) {
+            System.out.println("    Task number must be a valid integer!");
             printHorizontalLine();
         }
     }
 
     //Method to unmark task
     private static void unmarkTask(String userInput) {
-        int taskIndex = Integer.parseInt(userInput.split(" ")[1]) - 1;
-        if (taskIndex >= 0 && taskIndex < taskCount) {
+        try {
+            String parts[] = userInput.trim().split("\\s+");
+
+            // Check if user provided a task number
+            if (parts.length < 2) {
+                System.out.println("    Please provide the task number to unmark!");
+                printHorizontalLine();
+                return;
+            }
+
+            // Try converting to integer
+            int taskIndex = Integer.parseInt(parts[1]) - 1;
+
+            // Check if the number is valid
+            if (taskIndex < 0 || taskIndex >= taskCount) {
+                System.out.println("    Task number " + (taskIndex + 1) + " does not exist!");
+                printHorizontalLine();
+                return;
+            }
+
+            // Unmark as not done
             tasks[taskIndex].unmark();
             System.out.println("    OK, I've marked this task as not done yet:");
             System.out.println("    " + tasks[taskIndex]);
             printHorizontalLine();
-        } else {
-            System.out.println("    Task not found.");
+        } catch (NumberFormatException e) {
+            System.out.println("    Task number must be a valid integer!");
             printHorizontalLine();
         }
     }
