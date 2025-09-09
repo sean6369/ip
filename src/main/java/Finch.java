@@ -80,13 +80,19 @@ public class Finch {
                     break;
 
                 default:
-                    System.out.println("    Sorry, I don’t recognize that command!");
-                    System.out.println("    Available commands: list, todo, deadline, event, mark, unmark, bye");
-                    printHorizontalLine();
-                    break;
+                    // Unknow command: throw FinchException
+                    throw new FinchException(
+                            "I don't recognise this command\n" +
+                                    "    Available commands: list, todo, deadline, event, mark, unmark, bye"
+                    );
                 }
 
+            } catch (FinchException e) {
+                // All Finch-specific input errors are handled here
+                System.out.println("    OOPS!!! " + e.getMessage());
+                printHorizontalLine();
             } catch (Exception e) {
+                // Any unexpected runtime errors
                 System.out.println("    OOPS!!! Something went wrong: " + e.getMessage());
                 printHorizontalLine();
             }
@@ -219,15 +225,13 @@ public class Finch {
     }
 
     //Method to mark task
-    private static void markTask(String userInput) {
+    private static void markTask(String userInput) throws FinchException {
 
         String[] parts = userInput.trim().split("\\s+");
 
         // Check if user provided exactly 1 argument
         if (parts.length != 2) {
-            System.out.println("    OOPS! The mark command should be followed by exactly one task number.");
-            printHorizontalLine();
-            return;
+            throw new FinchException("The mark command should be followed by exactly one task number.");
         }
 
         try {
@@ -236,9 +240,7 @@ public class Finch {
 
             // Check if the number is valid
             if (taskIndex < 0 || taskIndex >= taskCount) {
-                System.out.println("    Task number " + (taskIndex + 1) + " does not exist!");
-                printHorizontalLine();
-                return;
+                throw new FinchException("Task number " + (taskIndex + 1) + " does not exist!");
             }
 
             // Mark as done
@@ -248,21 +250,18 @@ public class Finch {
             printHorizontalLine();
 
         } catch (NumberFormatException e) {
-            System.out.println("    Task number must be a valid integer!");
-            printHorizontalLine();
+            throw new FinchException("Task number must be a valid integer!");
         }
     }
 
     //Method to unmark task
-    private static void unmarkTask(String userInput) {
+    private static void unmarkTask(String userInput) throws FinchException {
 
         String[] parts = userInput.trim().split("\\s+");
 
-        // Check if user provided a task number
+        // Check if user provided exactly 1 argument
         if (parts.length != 2) {
-            System.out.println("    OOPS! The mark command should be followed by exactly one task number.");
-            printHorizontalLine();
-            return;
+            throw new FinchException("The mark command should be followed by exactly one task number.");
         }
 
         try {
@@ -271,9 +270,7 @@ public class Finch {
 
             // Check if the number is valid
             if (taskIndex < 0 || taskIndex >= taskCount) {
-                System.out.println("    Task number " + (taskIndex + 1) + " does not exist!");
-                printHorizontalLine();
-                return;
+                throw new FinchException("Task number " + (taskIndex + 1) + " does not exist!");
             }
 
             // Unmark as not done
@@ -283,8 +280,7 @@ public class Finch {
             printHorizontalLine();
 
         } catch (NumberFormatException e) {
-            System.out.println("    Task number must be a valid integer!");
-            printHorizontalLine();
+            throw new FinchException("Task number must be a valid integer!");
         }
     }
 }
