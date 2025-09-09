@@ -94,18 +94,46 @@ public class Finch {
 
     // Method for helper function to add tasks
     private static void addTask(Task task) {
-        tasks[taskCount] = task;
-        System.out.println("    Got it. I've added this task");
-        System.out.println("    " + tasks[taskCount]);
-        taskCount++;
-        System.out.println("    Now you have " + taskCount + " tasks in the list");
-        printHorizontalLine();
+        try {
+            if (task == null) {
+                System.out.println("    OOPS!!! Cannot add an empty task!");
+                printHorizontalLine();
+                return;
+            }
+
+            if (taskCount >= tasks.length) {
+                System.out.println("    OOPS!!! Cannot add more tasks, the list is full!");
+                printHorizontalLine();
+                return;
+            }
+
+            tasks[taskCount] = task;
+            System.out.println("    Got it. I've added this task");
+            System.out.println("    " + tasks[taskCount]);
+            taskCount++;
+            System.out.println("    Now you have " + taskCount + " tasks in the list");
+            printHorizontalLine();
+        } catch (Exception e) {
+            System.out.println("    OOPS!!! Something went wrong while adding the task: " + e.getMessage());
+            printHorizontalLine();
+        }
     }
 
     // Method to add todo
     private static void addToDo(String userInput) {
-        String taskDescription = userInput.substring(5); // Get the description after "todo "
-        addTask(new ToDo(taskDescription));
+        // Extract everything after "todo"
+        String description = userInput.substring(4).trim();
+
+        // Handle empty description
+        if (description.isEmpty()) {
+            System.out.println("    OOPS!!! The description of a todo cannot be empty!");
+            printHorizontalLine();
+            return;
+        }
+
+        // If valid, create and let addTask handle the rest
+        Task newTask = new ToDo(description);
+        addTask(newTask);
     }
 
     // Method to add deadline
@@ -144,7 +172,7 @@ public class Finch {
             printHorizontalLine();
             return;
         }
-        
+
         System.out.println("    Here are your tasks in your list:");
         for (int i = 0; i < taskCount; i++) {
             System.out.println("    " + (i + 1) + ". " + tasks[i]);
