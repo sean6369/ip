@@ -137,27 +137,22 @@ public class Finch {
     private static void addDeadline(String userInput) throws FinchException {
         // Check if the user included the "/by" keyword
         if (!userInput.contains(" /by")) {
-            System.out.println("    OOPS! The deadline command must be followed by <description> /by <date/time>.");
-            printHorizontalLine();
-            return;
+            throw new FinchException("The deadline command must be followed by <description> /by <date/time>.");
         }
 
         // Split description and date/time
         String[] parts = userInput.split(" /by", 2); // Limit 2 to avoid splitting extra /by
+
         String description = parts[0].substring(8).trim(); // Get the description after "deadline"
         String by = parts[1].trim(); // Get the date/time
 
         // Handle empty description or empty date/time
         if (description.isEmpty()) {
-            System.out.println("    OOPS! The description of a deadline cannot be empty!");
-            printHorizontalLine();
-            return;
+            throw new FinchException("The description of a deadline cannot be empty!");
         }
 
         if (by.isEmpty()) {
-            System.out.println("    OOPS! Please provide a date/time for the deadline!");
-            printHorizontalLine();
-            return;
+            throw new FinchException("Please provide a date/time for the deadline!");
         }
 
         // Create the Deadline task and pass it to addTask
@@ -169,28 +164,32 @@ public class Finch {
     private static void addEvent(String userInput) throws FinchException {
         // Check if the user included both "/from and /to"
         if (!userInput.contains(" /from") || !userInput.contains(" /to")) {
-            System.out.println("    OOPS! The event command needs to be followed by <description> /from <date/time> /to date/time>.");
-            printHorizontalLine();
-            return;
+            throw new FinchException("The event command needs to be followed by <description> /from <date/time> /to date/time>.");
         }
+
+        // Make sure "/from" comes before "/to"
+        int fromIndex = userInput.indexOf(" /from");
+        int toIndex = userInput.indexOf(" /to");
+
+        if (fromIndex > toIndex) {
+            throw new FinchException("The /from <date/time> must come before the /to <date/time>.");
+        }
+
 
         // Split the input safely into 3 parts: description, from and to
         String[] parts = userInput.split(" /from| /to", 3);
+
         String description = parts[0].substring(5).trim(); // Get the description after "event"
         String from = parts[1].trim(); // Get the start date/time
         String to = parts[2].trim(); // Get the end date/time
 
         // Handle empty description or empty dates
         if (description.isEmpty()) {
-            System.out.println("    OOPS! The description of a event cannot be empty!");
-            printHorizontalLine();
-            return;
+            throw new FinchException("The description of a event cannot be empty!");
         }
 
         if (from.isEmpty() || to.isEmpty()) {
-            System.out.println("    OOPS! Please provide both start (/from) and end (/to) date/time.");
-            printHorizontalLine();
-            return;
+            throw new FinchException("Please provide both start (/from) and end (/to) date/time.");
         }
 
         // Create the Event and pass it to addTask
