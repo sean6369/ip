@@ -139,6 +139,12 @@ public class Finch {
 
     //Method to list all tasks
     private static void listTasks() {
+        if (taskCount == 0) {
+            System.out.println("    There are no tasks in the list yet!");
+            printHorizontalLine();
+            return;
+        }
+        
         System.out.println("    Here are your tasks in your list:");
         for (int i = 0; i < taskCount; i++) {
             System.out.println("    " + (i + 1) + ". " + tasks[i]);
