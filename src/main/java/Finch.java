@@ -91,6 +91,7 @@ public class Finch {
                 // All Finch-specific input errors are handled here
                 System.out.println("    OOPS!!! " + e.getMessage());
                 printHorizontalLine();
+
             } catch (Exception e) {
                 // Any unexpected runtime errors
                 System.out.println("    OOPS!!! Something went wrong: " + e.getMessage());
@@ -100,43 +101,31 @@ public class Finch {
     }
 
     // Method for helper function to add tasks
-    private static void addTask(Task task) {
-        try {
-            if (task == null) {
-                System.out.println("    OOPS!!! Cannot add an empty task!");
-                printHorizontalLine();
-                return;
-            }
-
-            if (taskCount >= tasks.length) {
-                System.out.println("    OOPS!!! Cannot add more tasks, the list is full!");
-                printHorizontalLine();
-                return;
-            }
-
-            tasks[taskCount] = task;
-            System.out.println("    Got it. I've added this task");
-            System.out.println("    " + tasks[taskCount]);
-            taskCount++;
-            System.out.println("    Now you have " + taskCount + " tasks in the list");
-            printHorizontalLine();
-
-        } catch (Exception e) {
-            System.out.println("    OOPS!!! Something went wrong while adding the task: " + e.getMessage());
-            printHorizontalLine();
+    private static void addTask(Task task) throws FinchException {
+        if (task == null) {
+            throw new FinchException("Cannot add an empty task!");
         }
+
+        if (taskCount >= tasks.length) {
+            throw new FinchException("Cannot add more tasks, the list is full!");
+        }
+
+        tasks[taskCount] = task;
+        System.out.println("    Got it. I've added this task");
+        System.out.println("    " + tasks[taskCount]);
+        taskCount++;
+        System.out.println("    Now you have " + taskCount + " tasks in the list");
+        printHorizontalLine();
     }
 
     // Method to add todo
-    private static void addToDo(String userInput) {
+    private static void addToDo(String userInput) throws FinchException {
         // Extract everything after "todo"
         String description = userInput.substring(4).trim();
 
         // Handle empty description
         if (description.isEmpty()) {
-            System.out.println("    OOPS!!! The description of a todo cannot be empty!");
-            printHorizontalLine();
-            return;
+            throw new FinchException("The description of a todo cannot be empty!");
         }
 
         // If valid, create and let addTask handle the rest
@@ -145,7 +134,7 @@ public class Finch {
     }
 
     // Method to add deadline
-    private static void addDeadline(String userInput) {
+    private static void addDeadline(String userInput) throws FinchException {
         // Check if the user included the "/by" keyword
         if (!userInput.contains(" /by")) {
             System.out.println("    OOPS! The deadline command must be followed by <description> /by <date/time>.");
@@ -177,7 +166,7 @@ public class Finch {
     }
 
     // Method to add event
-    private static void addEvent(String userInput) {
+    private static void addEvent(String userInput) throws FinchException {
         // Check if the user included both "/from and /to"
         if (!userInput.contains(" /from") || !userInput.contains(" /to")) {
             System.out.println("    OOPS! The event command needs to be followed by <description> /from <date/time> /to date/time>.");
@@ -210,11 +199,9 @@ public class Finch {
     }
 
     //Method to list all tasks
-    private static void listTasks() {
+    private static void listTasks() throws FinchException {
         if (taskCount == 0) {
-            System.out.println("    There are no tasks in the list yet!");
-            printHorizontalLine();
-            return;
+            throw new FinchException("There are no tasks in the list yet!");
         }
 
         System.out.println("    Here are your tasks in your list:");
