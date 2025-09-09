@@ -1,3 +1,11 @@
+package finch.ui;
+
+import finch.task.Deadline;
+import finch.task.Event;
+import finch.exception.FinchException;
+import finch.task.Task;
+import finch.task.ToDo;
+
 import java.util.Scanner;
 
 public class Finch {
