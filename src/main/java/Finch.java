@@ -140,56 +140,67 @@ public class Finch {
 
     // Method to add deadline
     private static void addDeadline(String userInput) {
-        try {
-            // Check if the user included the "/by" keyword
-            if (!userInput.contains(" /by")) {
-                System.out.println("    OOPS! The deadline command must be followed by <description> /by <date/time>.");
-                printHorizontalLine();
-                return;
-            }
-
-            // Split description and date/time
-            String[] parts = userInput.split(" /by", 2); // Limit 2 to avoid splitting extra /by
-            String description = parts[0].substring(8).trim(); // Get the description after "deadline"
-            String by = parts[1].trim(); // Get the date/time
-
-            // Handle empty description or empty date/time
-            if (description.isEmpty()) {
-                System.out.println("    OOPS! The description of a deadline cannot be empty!");
-                printHorizontalLine();
-                return;
-            }
-
-            if (by.isEmpty()) {
-                System.out.println("    OOPS! Please provide a date/time for the deadline!");
-                printHorizontalLine();
-                return;
-            }
-
-            // Create the Deadline task and pass it to addTask
-            Task newTask = new Deadline(description, by);
-            addTask(newTask);
-
-        } catch (Exception e) {
-            // Catch unexpected errors
-            System.out.println("    OOPS! Something went wrong while adding the deadline: " + e.getMessage());
+        // Check if the user included the "/by" keyword
+        if (!userInput.contains(" /by")) {
+            System.out.println("    OOPS! The deadline command must be followed by <description> /by <date/time>.");
             printHorizontalLine();
+            return;
         }
+
+        // Split description and date/time
+        String[] parts = userInput.split(" /by", 2); // Limit 2 to avoid splitting extra /by
+        String description = parts[0].substring(8).trim(); // Get the description after "deadline"
+        String by = parts[1].trim(); // Get the date/time
+
+        // Handle empty description or empty date/time
+        if (description.isEmpty()) {
+            System.out.println("    OOPS! The description of a deadline cannot be empty!");
+            printHorizontalLine();
+            return;
+        }
+
+        if (by.isEmpty()) {
+            System.out.println("    OOPS! Please provide a date/time for the deadline!");
+            printHorizontalLine();
+            return;
+        }
+
+        // Create the Deadline task and pass it to addTask
+        Task newTask = new Deadline(description, by);
+        addTask(newTask);
     }
 
     // Method to add event
     private static void addEvent(String userInput) {
-        // Check if the input contains "/from and /to"
-        if (!userInput.contains(" /from ") || !userInput.contains(" /to ")) {
-            System.out.println("    OOPS! The event command needs to be followed by 'description /from date/time /to date/time'");
+        // Check if the user included both "/from and /to"
+        if (!userInput.contains(" /from") || !userInput.contains(" /to")) {
+            System.out.println("    OOPS! The event command needs to be followed by <description> /from <date/time> /to date/time>.");
             printHorizontalLine();
             return;
         }
-        String[] parts = userInput.split(" /from | /to ");
-        String taskDescription = parts[0].substring(6); // Get the description after "event "
-        String from = parts[1]; // Get the start date/time
-        String to = parts[2]; // Get the end date/time
-        addTask(new Event(taskDescription, from, to));
+
+        // Split the input safely into 3 parts: description, from and to
+        String[] parts = userInput.split(" /from| /to", 3);
+        String description = parts[0].substring(5).trim(); // Get the description after "event"
+        String from = parts[1].trim(); // Get the start date/time
+        String to = parts[2].trim(); // Get the end date/time
+
+        // Handle empty description or empty dates
+        if (description.isEmpty()) {
+            System.out.println("    OOPS! The description of a event cannot be empty!");
+            printHorizontalLine();
+            return;
+        }
+
+        if (from.isEmpty() || to.isEmpty()) {
+            System.out.println("    OOPS! Please provide both start (/from) and end (/to) date/time.");
+            printHorizontalLine();
+            return;
+        }
+
+        // Create the Event and pass it to addTask
+        Task newTask = new Event(description, from, to);
+        addTask(newTask);
     }
 
     //Method to list all tasks
@@ -209,16 +220,17 @@ public class Finch {
 
     //Method to mark task
     private static void markTask(String userInput) {
+
+        String[] parts = userInput.trim().split("\\s+");
+
+        // Check if user provided exactly 1 argument
+        if (parts.length != 2) {
+            System.out.println("    OOPS! The mark command should be followed by exactly one task number.");
+            printHorizontalLine();
+            return;
+        }
+
         try {
-            String[] parts = userInput.trim().split("\\s+");
-
-            // Check if user provided a task number
-            if (parts.length < 2) {
-                System.out.println("    Please provide the task number to mark!");
-                printHorizontalLine();
-                return;
-            }
-
             // Try converting to integer
             int taskIndex = Integer.parseInt(parts[1]) - 1;
 
@@ -243,16 +255,17 @@ public class Finch {
 
     //Method to unmark task
     private static void unmarkTask(String userInput) {
+
+        String[] parts = userInput.trim().split("\\s+");
+
+        // Check if user provided a task number
+        if (parts.length != 2) {
+            System.out.println("    OOPS! The mark command should be followed by exactly one task number.");
+            printHorizontalLine();
+            return;
+        }
+
         try {
-            String parts[] = userInput.trim().split("\\s+");
-
-            // Check if user provided a task number
-            if (parts.length < 2) {
-                System.out.println("    Please provide the task number to unmark!");
-                printHorizontalLine();
-                return;
-            }
-
             // Try converting to integer
             int taskIndex = Integer.parseInt(parts[1]) - 1;
 
