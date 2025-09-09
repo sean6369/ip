@@ -62,13 +62,14 @@
     5.   [T][ ] borrow book
     ____________________________________________________________
     ____________________________________________________________
-    OOPS! The deadline command needs to be followed by 'description /by date/time'
+    OOPS!!! The deadline command must be followed by <description> /by <date/time>.
     ____________________________________________________________
     ____________________________________________________________
-    OOPS! The event command needs to be followed by 'description /from date/time /to date/time'
+    OOPS!!! The event command must be followed by <description> /from <date/time> /to <date/time>.
     ____________________________________________________________
     ____________________________________________________________
-    Invalid command!
+    OOPS!!! I don't recognise this command
+    Available commands: list, todo, deadline, event, mark, unmark, bye
     ____________________________________________________________
     ____________________________________________________________
     Bye. Hope to see you again soon!
