@@ -85,6 +85,7 @@ public class Finch {
                     printHorizontalLine();
                     break;
                 }
+
             } catch (Exception e) {
                 System.out.println("    OOPS!!! Something went wrong: " + e.getMessage());
                 printHorizontalLine();
@@ -113,6 +114,7 @@ public class Finch {
             taskCount++;
             System.out.println("    Now you have " + taskCount + " tasks in the list");
             printHorizontalLine();
+
         } catch (Exception e) {
             System.out.println("    OOPS!!! Something went wrong while adding the task: " + e.getMessage());
             printHorizontalLine();
@@ -138,16 +140,41 @@ public class Finch {
 
     // Method to add deadline
     private static void addDeadline(String userInput) {
-        // Check if the input contains "/by"
-        if (!userInput.contains(" /by ")) {
-            System.out.println("    OOPS! The deadline command needs to be followed by 'description /by date/time'");
+        try {
+            // Check if the user included the "/by" keyword
+            if (!userInput.contains(" /by")) {
+                System.out.println("    OOPS! The deadline command must be followed by <description> /by <date/time>.");
+                printHorizontalLine();
+                return;
+            }
+
+            // Split description and date/time
+            String[] parts = userInput.split(" /by", 2); // Limit 2 to avoid splitting extra /by
+            String description = parts[0].substring(8).trim(); // Get the description after "deadline"
+            String by = parts[1].trim(); // Get the date/time
+
+            // Handle empty description or empty date/time
+            if (description.isEmpty()) {
+                System.out.println("    OOPS! The description of a deadline cannot be empty!");
+                printHorizontalLine();
+                return;
+            }
+
+            if (by.isEmpty()) {
+                System.out.println("    OOPS! Please provide a date/time for the deadline!");
+                printHorizontalLine();
+                return;
+            }
+
+            // Create the Deadline task and pass it to addTask
+            Task newTask = new Deadline(description, by);
+            addTask(newTask);
+
+        } catch (Exception e) {
+            // Catch unexpected errors
+            System.out.println("    OOPS! Something went wrong while adding the deadline: " + e.getMessage());
             printHorizontalLine();
-            return;
         }
-        String[] parts = userInput.split(" /by ");
-        String taskDescription = parts[0].substring(9); // Get the description after "deadline "
-        String by = parts[1]; // Get the date/time
-        addTask(new Deadline(taskDescription, by));
     }
 
     // Method to add event
@@ -241,6 +268,7 @@ public class Finch {
             System.out.println("    OK, I've marked this task as not done yet:");
             System.out.println("    " + tasks[taskIndex]);
             printHorizontalLine();
+
         } catch (NumberFormatException e) {
             System.out.println("    Task number must be a valid integer!");
             printHorizontalLine();
