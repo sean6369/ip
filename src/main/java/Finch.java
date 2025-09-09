@@ -80,13 +80,20 @@ public class Finch {
                     break;
 
                 default:
-                    System.out.println("    Sorry, I don’t recognize that command!");
-                    System.out.println("    Available commands: list, todo, deadline, event, mark, unmark, bye");
-                    printHorizontalLine();
-                    break;
+                    // Unknow command: throw FinchException
+                    throw new FinchException(
+                            "I don't recognise this command\n" +
+                                    "    Available commands: list, todo, deadline, event, mark, unmark, bye"
+                    );
                 }
 
+            } catch (FinchException e) {
+                // All Finch-specific input errors are handled here
+                System.out.println("    OOPS!!! " + e.getMessage());
+                printHorizontalLine();
+
             } catch (Exception e) {
+                // Any unexpected runtime errors
                 System.out.println("    OOPS!!! Something went wrong: " + e.getMessage());
                 printHorizontalLine();
             }
@@ -94,43 +101,31 @@ public class Finch {
     }
 
     // Method for helper function to add tasks
-    private static void addTask(Task task) {
-        try {
-            if (task == null) {
-                System.out.println("    OOPS!!! Cannot add an empty task!");
-                printHorizontalLine();
-                return;
-            }
-
-            if (taskCount >= tasks.length) {
-                System.out.println("    OOPS!!! Cannot add more tasks, the list is full!");
-                printHorizontalLine();
-                return;
-            }
-
-            tasks[taskCount] = task;
-            System.out.println("    Got it. I've added this task");
-            System.out.println("    " + tasks[taskCount]);
-            taskCount++;
-            System.out.println("    Now you have " + taskCount + " tasks in the list");
-            printHorizontalLine();
-
-        } catch (Exception e) {
-            System.out.println("    OOPS!!! Something went wrong while adding the task: " + e.getMessage());
-            printHorizontalLine();
+    private static void addTask(Task task) throws FinchException {
+        if (task == null) {
+            throw new FinchException("Cannot add an empty task!");
         }
+
+        if (taskCount >= tasks.length) {
+            throw new FinchException("Cannot add more tasks, the list is full!");
+        }
+
+        tasks[taskCount] = task;
+        System.out.println("    Got it. I've added this task");
+        System.out.println("    " + tasks[taskCount]);
+        taskCount++;
+        System.out.println("    Now you have " + taskCount + " tasks in the list");
+        printHorizontalLine();
     }
 
     // Method to add todo
-    private static void addToDo(String userInput) {
+    private static void addToDo(String userInput) throws FinchException {
         // Extract everything after "todo"
         String description = userInput.substring(4).trim();
 
         // Handle empty description
         if (description.isEmpty()) {
-            System.out.println("    OOPS!!! The description of a todo cannot be empty!");
-            printHorizontalLine();
-            return;
+            throw new FinchException("The description of a todo cannot be empty!");
         }
 
         // If valid, create and let addTask handle the rest
@@ -138,77 +133,81 @@ public class Finch {
         addTask(newTask);
     }
 
-    // Method to add deadline
-    private static void addDeadline(String userInput) {
+    // Helper method: parse user input and return a Deadline task
+    private static Task parseDeadline(String userInput) throws FinchException {
         // Check if the user included the "/by" keyword
         if (!userInput.contains(" /by")) {
-            System.out.println("    OOPS! The deadline command must be followed by <description> /by <date/time>.");
-            printHorizontalLine();
-            return;
+            throw new FinchException(
+                    "The deadline command must be followed by <description> /by <date/time>."
+            );
         }
 
         // Split description and date/time
-        String[] parts = userInput.split(" /by", 2); // Limit 2 to avoid splitting extra /by
-        String description = parts[0].substring(8).trim(); // Get the description after "deadline"
+        String[] parts = userInput.split(" /by", 2);
+        String description = parts[0].substring(8).trim(); // Get description after "deadline"
         String by = parts[1].trim(); // Get the date/time
 
         // Handle empty description or empty date/time
         if (description.isEmpty()) {
-            System.out.println("    OOPS! The description of a deadline cannot be empty!");
-            printHorizontalLine();
-            return;
+            throw new FinchException("The description of a deadline cannot be empty!");
         }
-
         if (by.isEmpty()) {
-            System.out.println("    OOPS! Please provide a date/time for the deadline!");
-            printHorizontalLine();
-            return;
+            throw new FinchException("Please provide a date/time for the deadline!");
         }
 
-        // Create the Deadline task and pass it to addTask
-        Task newTask = new Deadline(description, by);
-        addTask(newTask);
+        // Return the Deadline object
+        return new Deadline(description, by);
     }
 
-    // Method to add event
-    private static void addEvent(String userInput) {
+    // Method to add deadline
+    private static void addDeadline(String userInput) throws FinchException {
+        Task newTask = parseDeadline(userInput); //parseEvent throws FinchException if input is invalid
+        addTask(newTask); // addTask also throws FinchException if something goes wrong
+    }
+
+    // Helper method: parse user input and return an Event task
+    private static Task parseEvent(String userInput) throws FinchException {
         // Check if the user included both "/from and /to"
         if (!userInput.contains(" /from") || !userInput.contains(" /to")) {
-            System.out.println("    OOPS! The event command needs to be followed by <description> /from <date/time> /to date/time>.");
-            printHorizontalLine();
-            return;
+            throw new FinchException("The event command must be followed by <description> /from <date/time> /to <date/time>.");
         }
 
-        // Split the input safely into 3 parts: description, from and to
-        String[] parts = userInput.split(" /from| /to", 3);
+        // Make sure "/from" comes before "/to"
+        int fromIndex = userInput.indexOf(" /from");
+        int toIndex = userInput.indexOf(" /to");
+
+        if (fromIndex > toIndex) {
+            throw new FinchException("The /from <date/time> must come before the /to <date/time>.");
+        }
+
+        // Split input safely into 3 parts: description, from and to
+        String[] parts = userInput.split(" /from| /to", 3); // Limit 3 to avoid splitting extra /from or /to
+
         String description = parts[0].substring(5).trim(); // Get the description after "event"
         String from = parts[1].trim(); // Get the start date/time
         String to = parts[2].trim(); // Get the end date/time
 
         // Handle empty description or empty dates
         if (description.isEmpty()) {
-            System.out.println("    OOPS! The description of a event cannot be empty!");
-            printHorizontalLine();
-            return;
+            throw new FinchException("The description of an event cannot be empty!");
         }
-
         if (from.isEmpty() || to.isEmpty()) {
-            System.out.println("    OOPS! Please provide both start (/from) and end (/to) date/time.");
-            printHorizontalLine();
-            return;
+            throw new FinchException("Please provide both start (/from) and end (/to) date/time.");
         }
 
-        // Create the Event and pass it to addTask
-        Task newTask = new Event(description, from, to);
-        addTask(newTask);
+        return new Event(description, from, to); // Return Task
+    }
+
+    // Method to add event
+    private static void addEvent(String userInput) throws FinchException {
+        Task newTask = parseEvent(userInput); // parseEvent throws FinchException if input is invalid
+        addTask(newTask); // addTask also throws FinchException if something goes wrong
     }
 
     //Method to list all tasks
-    private static void listTasks() {
+    private static void listTasks() throws FinchException {
         if (taskCount == 0) {
-            System.out.println("    There are no tasks in the list yet!");
-            printHorizontalLine();
-            return;
+            throw new FinchException("There are no tasks in the list yet!");
         }
 
         System.out.println("    Here are your tasks in your list:");
@@ -219,15 +218,13 @@ public class Finch {
     }
 
     //Method to mark task
-    private static void markTask(String userInput) {
+    private static void markTask(String userInput) throws FinchException {
 
         String[] parts = userInput.trim().split("\\s+");
 
         // Check if user provided exactly 1 argument
         if (parts.length != 2) {
-            System.out.println("    OOPS! The mark command should be followed by exactly one task number.");
-            printHorizontalLine();
-            return;
+            throw new FinchException("The mark command should be followed by exactly one task number.");
         }
 
         try {
@@ -236,9 +233,7 @@ public class Finch {
 
             // Check if the number is valid
             if (taskIndex < 0 || taskIndex >= taskCount) {
-                System.out.println("    Task number " + (taskIndex + 1) + " does not exist!");
-                printHorizontalLine();
-                return;
+                throw new FinchException("Task number " + (taskIndex + 1) + " does not exist!");
             }
 
             // Mark as done
@@ -248,21 +243,18 @@ public class Finch {
             printHorizontalLine();
 
         } catch (NumberFormatException e) {
-            System.out.println("    Task number must be a valid integer!");
-            printHorizontalLine();
+            throw new FinchException("Task number must be a valid integer!");
         }
     }
 
     //Method to unmark task
-    private static void unmarkTask(String userInput) {
+    private static void unmarkTask(String userInput) throws FinchException {
 
         String[] parts = userInput.trim().split("\\s+");
 
-        // Check if user provided a task number
+        // Check if user provided exactly 1 argument
         if (parts.length != 2) {
-            System.out.println("    OOPS! The mark command should be followed by exactly one task number.");
-            printHorizontalLine();
-            return;
+            throw new FinchException("The mark command should be followed by exactly one task number.");
         }
 
         try {
@@ -271,9 +263,7 @@ public class Finch {
 
             // Check if the number is valid
             if (taskIndex < 0 || taskIndex >= taskCount) {
-                System.out.println("    Task number " + (taskIndex + 1) + " does not exist!");
-                printHorizontalLine();
-                return;
+                throw new FinchException("Task number " + (taskIndex + 1) + " does not exist!");
             }
 
             // Unmark as not done
@@ -283,8 +273,7 @@ public class Finch {
             printHorizontalLine();
 
         } catch (NumberFormatException e) {
-            System.out.println("    Task number must be a valid integer!");
-            printHorizontalLine();
+            throw new FinchException("Task number must be a valid integer!");
         }
     }
 }
