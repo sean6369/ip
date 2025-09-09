@@ -133,38 +133,43 @@ public class Finch {
         addTask(newTask);
     }
 
-    // Method to add deadline
-    private static void addDeadline(String userInput) throws FinchException {
+    // Helper method: parse user input and return a Deadline task
+    private static Task parseDeadline(String userInput) throws FinchException {
         // Check if the user included the "/by" keyword
         if (!userInput.contains(" /by")) {
-            throw new FinchException("The deadline command must be followed by <description> /by <date/time>.");
+            throw new FinchException(
+                    "The deadline command must be followed by <description> /by <date/time>."
+            );
         }
 
         // Split description and date/time
-        String[] parts = userInput.split(" /by", 2); // Limit 2 to avoid splitting extra /by
-
-        String description = parts[0].substring(8).trim(); // Get the description after "deadline"
+        String[] parts = userInput.split(" /by", 2);
+        String description = parts[0].substring(8).trim(); // Get description after "deadline"
         String by = parts[1].trim(); // Get the date/time
 
         // Handle empty description or empty date/time
         if (description.isEmpty()) {
             throw new FinchException("The description of a deadline cannot be empty!");
         }
-
         if (by.isEmpty()) {
             throw new FinchException("Please provide a date/time for the deadline!");
         }
 
-        // Create the Deadline task and pass it to addTask
-        Task newTask = new Deadline(description, by);
-        addTask(newTask);
+        // Return the Deadline object
+        return new Deadline(description, by);
     }
 
-    // Method to add event
-    private static void addEvent(String userInput) throws FinchException {
+    // Method to add deadline
+    private static void addDeadline(String userInput) throws FinchException {
+        Task newTask = parseDeadline(userInput); //parseEvent throws FinchException if input is invalid
+        addTask(newTask); // addTask also throws FinchException if something goes wrong
+    }
+
+    // Helper method: parse user input and return an Event task
+    private static Task parseEvent(String userInput) throws FinchException {
         // Check if the user included both "/from and /to"
         if (!userInput.contains(" /from") || !userInput.contains(" /to")) {
-            throw new FinchException("The event command needs to be followed by <description> /from <date/time> /to date/time>.");
+            throw new FinchException("The event command must be followed by <description> /from <date/time> /to <date/time>.");
         }
 
         // Make sure "/from" comes before "/to"
@@ -175,9 +180,8 @@ public class Finch {
             throw new FinchException("The /from <date/time> must come before the /to <date/time>.");
         }
 
-
-        // Split the input safely into 3 parts: description, from and to
-        String[] parts = userInput.split(" /from| /to", 3);
+        // Split input safely into 3 parts: description, from and to
+        String[] parts = userInput.split(" /from| /to", 3); // Limit 3 to avoid splitting extra /from or /to
 
         String description = parts[0].substring(5).trim(); // Get the description after "event"
         String from = parts[1].trim(); // Get the start date/time
@@ -185,16 +189,19 @@ public class Finch {
 
         // Handle empty description or empty dates
         if (description.isEmpty()) {
-            throw new FinchException("The description of a event cannot be empty!");
+            throw new FinchException("The description of an event cannot be empty!");
         }
-
         if (from.isEmpty() || to.isEmpty()) {
             throw new FinchException("Please provide both start (/from) and end (/to) date/time.");
         }
 
-        // Create the Event and pass it to addTask
-        Task newTask = new Event(description, from, to);
-        addTask(newTask);
+        return new Event(description, from, to); // Return Task
+    }
+
+    // Method to add event
+    private static void addEvent(String userInput) throws FinchException {
+        Task newTask = parseEvent(userInput); // parseEvent throws FinchException if input is invalid
+        addTask(newTask); // addTask also throws FinchException if something goes wrong
     }
 
     //Method to list all tasks
