@@ -6,7 +6,9 @@ import finch.exception.FinchException;
 import finch.task.Task;
 import finch.task.ToDo;
 
+import java.sql.Array;
 import java.util.Scanner;
+import java.util.ArrayList;
 
 public class Finch {
 
@@ -18,11 +20,8 @@ public class Finch {
         System.out.println("    ____________________________________________________________");
     }
 
-    // Array to store tasks
-    private static final Task[] tasks = new Task[100];
-
-    // Counter for the number of tasks
-    private static int taskCount = 0;
+    // Array List to store tasks
+    private static final ArrayList<Task> tasks = new ArrayList<>();
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -87,6 +86,10 @@ public class Finch {
                     addEvent(userInput);
                     break;
 
+                case "delete":
+                    deleteTask(userInput);
+                    break;
+
                 default:
                     // Unknow command: throw FinchException
                     throw new FinchException(
@@ -114,15 +117,11 @@ public class Finch {
             throw new FinchException("Cannot add an empty task!");
         }
 
-        if (taskCount >= tasks.length) {
-            throw new FinchException("Cannot add more tasks, the list is full!");
-        }
+        tasks.add(task);
 
-        tasks[taskCount] = task;
         System.out.println("    Got it. I've added this task");
-        System.out.println("    " + tasks[taskCount]);
-        taskCount++;
-        System.out.println("    Now you have " + taskCount + " tasks in the list");
+        System.out.println("    " + task);
+        System.out.println("    Now you have " + tasks.size() + " tasks in the list");
         printHorizontalLine();
     }
 
@@ -145,9 +144,7 @@ public class Finch {
     private static Task parseDeadline(String userInput) throws FinchException {
         // Check if the user included the "/by" keyword
         if (!userInput.contains(" /by")) {
-            throw new FinchException(
-                    "The deadline command must be followed by <description> /by <date/time>."
-            );
+            throw new FinchException("The deadline command must be followed by <description> /by <date/time>.");
         }
 
         // Split description and date/time
@@ -214,13 +211,13 @@ public class Finch {
 
     //Method to list all tasks
     private static void listTasks() throws FinchException {
-        if (taskCount == 0) {
+        if (tasks.isEmpty()) {
             throw new FinchException("There are no tasks in the list yet!");
         }
 
         System.out.println("    Here are your tasks in your list:");
-        for (int i = 0; i < taskCount; i++) {
-            System.out.println("    " + (i + 1) + ". " + tasks[i]);
+        for (int i = 0; i < tasks.size(); i++) {
+            System.out.println("    " + (i + 1) + ". " + tasks.get(i));
         }
         printHorizontalLine();
     }
@@ -240,14 +237,16 @@ public class Finch {
             int taskIndex = Integer.parseInt(parts[1]) - 1;
 
             // Check if the number is valid
-            if (taskIndex < 0 || taskIndex >= taskCount) {
+            if (taskIndex < 0 || taskIndex >= tasks.size()) {
                 throw new FinchException("Task number " + (taskIndex + 1) + " does not exist!");
             }
 
             // Mark as done
-            tasks[taskIndex].markAsDone();
+            Task task = tasks.get(taskIndex);
+            task.markAsDone();
+
             System.out.println("    Nice! I've marked this task as done:");
-            System.out.println("    " + tasks[taskIndex]);
+            System.out.println("    " + task);
             printHorizontalLine();
 
         } catch (NumberFormatException e) {
@@ -270,16 +269,47 @@ public class Finch {
             int taskIndex = Integer.parseInt(parts[1]) - 1;
 
             // Check if the number is valid
-            if (taskIndex < 0 || taskIndex >= taskCount) {
+            if (taskIndex < 0 || taskIndex >= tasks.size()) {
                 throw new FinchException("Task number " + (taskIndex + 1) + " does not exist!");
             }
 
             // Unmark as not done
-            tasks[taskIndex].unmark();
+            Task task = tasks.get(taskIndex);
+            task.unmark();
+
             System.out.println("    OK, I've marked this task as not done yet:");
-            System.out.println("    " + tasks[taskIndex]);
+            System.out.println("    " + task);
             printHorizontalLine();
 
+        } catch (NumberFormatException e) {
+            throw new FinchException("Task number must be a valid integer!");
+        }
+    }
+
+    // Method to delete task
+    private static void deleteTask(String userInput) throws FinchException {
+
+        String[] parts = userInput.trim().split("\\s+");
+
+        if (parts.length != 2) {
+            throw new FinchException("The delete command should be followed by exactly one task number.");
+        }
+
+        try {
+            // Try converting to integer
+            int taskIndex = Integer.parseInt(parts[1]) - 1;
+
+            // Check if the number is valid
+            if (taskIndex < 0 || taskIndex >= tasks.size()) {
+                throw new FinchException("Task number " + (taskIndex + 1) + " does not exist!");
+            }
+
+            Task removedTask = tasks.remove(taskIndex);
+
+            System.out.println("    Noted. I've removed this task:");
+            System.out.println("    " + removedTask);
+            System.out.println("    Now you have " + tasks.size() + " tasks in the list");
+            printHorizontalLine();
         } catch (NumberFormatException e) {
             throw new FinchException("Task number must be a valid integer!");
         }
