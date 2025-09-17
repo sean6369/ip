@@ -1,12 +1,12 @@
 package finch.ui;
 
+import finch.task.Task;
+import finch.task.ToDo;
 import finch.task.Deadline;
 import finch.task.Event;
 import finch.exception.FinchException;
-import finch.task.Task;
-import finch.task.ToDo;
+import finch.storage.Storage;
 
-import java.sql.Array;
 import java.util.Scanner;
 import java.util.ArrayList;
 
@@ -20,10 +20,22 @@ public class Finch {
         System.out.println("    ____________________________________________________________");
     }
 
-    // Array List to store tasks
-    private static final ArrayList<Task> tasks = new ArrayList<>();
+    // Handles reading from and writing to the data file (persistent storage for tasks)
+    private static Storage storage;
+
+    // Use ArrayList to store tasks
+    private static ArrayList<Task> tasks;
 
     public static void main(String[] args) {
+        storage = new Storage("./data/finch.txt");
+
+        try {
+            tasks = storage.load(); // Load saved tasks
+        } catch (FinchException e) {
+            System.out.println("    OOPS! Could not load tasks: " + e.getMessage());
+            tasks = new ArrayList<>(); // Start fresh if file corrupted/missing
+        }
+
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("""
@@ -123,6 +135,9 @@ public class Finch {
         System.out.println("    " + task);
         System.out.println("    Now you have " + tasks.size() + " tasks in the list");
         printHorizontalLine();
+
+        // Save updated task list
+        storage.save(tasks);
     }
 
     // Method to add todo
@@ -249,6 +264,9 @@ public class Finch {
             System.out.println("    " + task);
             printHorizontalLine();
 
+            // Save change immediately
+            storage.save(tasks);
+
         } catch (NumberFormatException e) {
             throw new FinchException("Task number must be a valid integer!");
         }
@@ -281,6 +299,9 @@ public class Finch {
             System.out.println("    " + task);
             printHorizontalLine();
 
+            // Save change immediately
+            storage.save(tasks);
+
         } catch (NumberFormatException e) {
             throw new FinchException("Task number must be a valid integer!");
         }
@@ -310,6 +331,10 @@ public class Finch {
             System.out.println("    " + removedTask);
             System.out.println("    Now you have " + tasks.size() + " tasks in the list");
             printHorizontalLine();
+
+            // Save updated tasks to file
+            storage.save(tasks);
+
         } catch (NumberFormatException e) {
             throw new FinchException("Task number must be a valid integer!");
         }
