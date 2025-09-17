@@ -5,7 +5,9 @@ import finch.task.Event;
 import finch.exception.FinchException;
 import finch.task.Task;
 import finch.task.ToDo;
+import finch.storage.Storage;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Finch {
@@ -18,13 +20,21 @@ public class Finch {
         System.out.println("    ____________________________________________________________");
     }
 
-    // Array to store tasks
-    private static final Task[] tasks = new Task[100];
+    private static Storage storage;
 
-    // Counter for the number of tasks
-    private static int taskCount = 0;
+    // Use ArrayList to store tasks
+    private static ArrayList<Task> tasks;
 
     public static void main(String[] args) {
+        storage = new Storage("./data/finch.txt");
+
+        try {
+            tasks = storage.load();
+        } catch (FinchException e) {
+            System.out.println("    OOPS! Could not load tasks: " + e.getMessage());
+            tasks = new ArrayList<>();
+        }
+
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("""
@@ -114,16 +124,15 @@ public class Finch {
             throw new FinchException("Cannot add an empty task!");
         }
 
-        if (taskCount >= tasks.length) {
-            throw new FinchException("Cannot add more tasks, the list is full!");
-        }
+        tasks.add(task);
 
-        tasks[taskCount] = task;
         System.out.println("    Got it. I've added this task");
-        System.out.println("    " + tasks[taskCount]);
-        taskCount++;
-        System.out.println("    Now you have " + taskCount + " tasks in the list");
+        System.out.println("    " + task);
+        System.out.println("    Now you have " + tasks.size() + " tasks in the list");
         printHorizontalLine();
+
+        // Save updated task list
+        storage.save(tasks);
     }
 
     // Method to add todo
@@ -214,13 +223,13 @@ public class Finch {
 
     //Method to list all tasks
     private static void listTasks() throws FinchException {
-        if (taskCount == 0) {
+        if (tasks.isEmpty()) {
             throw new FinchException("There are no tasks in the list yet!");
         }
 
         System.out.println("    Here are your tasks in your list:");
-        for (int i = 0; i < taskCount; i++) {
-            System.out.println("    " + (i + 1) + ". " + tasks[i]);
+        for (int i = 0; i < tasks.size(); i++) {
+            System.out.println("    " + (i + 1) + ". " + tasks.get(i));
         }
         printHorizontalLine();
     }
@@ -240,15 +249,19 @@ public class Finch {
             int taskIndex = Integer.parseInt(parts[1]) - 1;
 
             // Check if the number is valid
-            if (taskIndex < 0 || taskIndex >= taskCount) {
+            if (taskIndex < 0 || taskIndex >= tasks.size()) {
                 throw new FinchException("Task number " + (taskIndex + 1) + " does not exist!");
             }
 
             // Mark as done
-            tasks[taskIndex].markAsDone();
+            Task task = tasks.get(taskIndex);
+            task.markAsDone();
             System.out.println("    Nice! I've marked this task as done:");
-            System.out.println("    " + tasks[taskIndex]);
+            System.out.println("    " + task);
             printHorizontalLine();
+
+            // Save change immediately
+            storage.save(tasks);
 
         } catch (NumberFormatException e) {
             throw new FinchException("Task number must be a valid integer!");
@@ -270,15 +283,19 @@ public class Finch {
             int taskIndex = Integer.parseInt(parts[1]) - 1;
 
             // Check if the number is valid
-            if (taskIndex < 0 || taskIndex >= taskCount) {
+            if (taskIndex < 0 || taskIndex >= tasks.size()) {
                 throw new FinchException("Task number " + (taskIndex + 1) + " does not exist!");
             }
 
             // Unmark as not done
-            tasks[taskIndex].unmark();
+            Task task = tasks.get(taskIndex);
+            task.unmark();
             System.out.println("    OK, I've marked this task as not done yet:");
-            System.out.println("    " + tasks[taskIndex]);
+            System.out.println("    " + task);
             printHorizontalLine();
+
+            // Save change immediately
+            storage.save(tasks);
 
         } catch (NumberFormatException e) {
             throw new FinchException("Task number must be a valid integer!");
