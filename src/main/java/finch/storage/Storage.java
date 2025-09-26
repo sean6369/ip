@@ -11,7 +11,7 @@ import java.util.Scanner;
 public class Storage {
     private final File file;
 
-    public Storage(String filePath) {
+    public Storage(String filePath) throws FinchException {
         this.file = new File(filePath);
 
         // Ensure parent directory exists
@@ -19,7 +19,7 @@ public class Storage {
         if (parent != null && !parent.exists()) {
             boolean created = parent.mkdirs();
             if (!created) {
-                System.out.println("⚠ Warning: Could not create directory " + parent.getAbsolutePath());
+                throw new FinchException("Failed to create directory: " + parent.getAbsolutePath());
             }
         }
 
@@ -28,19 +28,19 @@ public class Storage {
             if (!file.exists()) {
                 boolean createdFile = file.createNewFile();
                 if (!createdFile) {
-                    System.out.println("⚠ Warning: Could not create file " + file.getAbsolutePath());
+                    throw new FinchException("Failed to create file: " + file.getAbsolutePath());
                 }
             }
         } catch (IOException e) {
-            throw new RuntimeException("Failed to create storage file: " + e.getMessage(), e);
+            throw new FinchException("Failed to create storage file: " + e.getMessage());
         }
     }
 
-    // Save tasks into file
     public void save(TaskList tasks) throws FinchException {
-        try (FileWriter fw = new FileWriter(file)) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
             for (int i = 0; i < tasks.size(); i++) {
-                fw.write(tasks.getTask(i).encode() + System.lineSeparator());
+                bw.write(tasks.getTask(i).encode());
+                bw.newLine();
             }
         } catch (IOException e) {
             throw new FinchException("Failed to save tasks: " + e.getMessage());
@@ -50,9 +50,9 @@ public class Storage {
     // Load tasks from file
     public TaskList load() throws FinchException {
         ArrayList<Task> taskList = new ArrayList<>();
-        try (Scanner sc = new Scanner(file)) {
-            while (sc.hasNextLine()) {
-                String line = sc.nextLine();
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = br.readLine()) != null) {
                 Task task = Task.decode(line);
                 taskList.add(task);
             }

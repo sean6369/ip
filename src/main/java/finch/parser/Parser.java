@@ -1,42 +1,30 @@
 package finch.parser;
 
+import finch.command.*;
 import finch.exception.FinchException;
+
 
 public class Parser {
 
-    /**
-     * Parses a full user input and extracts the command word.
-     *
-     * @param fullCommand the full line of user input
-     * @return the first word (command) in lowercase
-     * @throws FinchException if input is empty or null
-     */
-    public static String parseCommand(String fullCommand) throws FinchException {
-        if (fullCommand == null || fullCommand.trim().isEmpty()) {
-            throw new FinchException("Please enter a command!");
+    public static Command parse(String fullCommand) throws FinchException {
+        if (fullCommand == null || fullCommand.isBlank()) {
+            return new UnknownCommand(""); // or EmptyCommand
         }
 
         String[] parts = fullCommand.trim().split("\\s+", 2);
-        return parts[0].toLowerCase();
-    }
+        String commandWord = parts[0].toLowerCase();
+        String arguments = parts.length > 1 ? parts[1] : "";
 
-    /**
-     * Returns the arguments part of the input (everything after the command).
-     *
-     * @param fullCommand the full line of user input
-     * @return the arguments string (maybe empty)
-     * @throws FinchException if input is empty or null
-     */
-    public static String parseArguments(String fullCommand) throws FinchException {
-        if (fullCommand == null || fullCommand.trim().isEmpty()) {
-            throw new FinchException("Please enter a command!");
-        }
-
-        String[] parts = fullCommand.trim().split("\\s+", 2);
-        if (parts.length > 1) {
-            return parts[1].trim();
-        } else {
-            return "";
-        }
+        return switch (commandWord) {
+            case "todo" -> new AddTodoCommand(arguments);
+            case "deadline" -> new AddDeadlineCommand(arguments);
+            case "event" -> new AddEventCommand(arguments);
+            case "list" -> new ListCommand();
+            case "mark" -> new MarkCommand(arguments);
+            case "unmark" -> new UnmarkCommand(arguments);
+            case "delete" -> new DeleteCommand(arguments);
+            case "bye" -> new ExitCommand();
+            default -> new UnknownCommand(commandWord);
+        };
     }
 }

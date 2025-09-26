@@ -3,137 +3,101 @@ package finch.task;
 import finch.exception.FinchException;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class TaskList {
     private final ArrayList<Task> tasks;
 
-    // Construct with an empty list
+    // Constructor: empty task list
     public TaskList() {
         this.tasks = new ArrayList<>();
     }
 
-    // Construct with a preloaded list (from Storage)
+    // Constructor: preloaded task list
     public TaskList(ArrayList<Task> tasks) {
-        this.tasks = tasks;
+        this.tasks = tasks != null ? tasks : new ArrayList<>();
     }
 
-    // Helper ToDo method with proper error handling
-    private ToDo createTodo(String description) throws FinchException {
+    // --- Add tasks ---
+
+    public Task addTodo(String description) throws FinchException {
         if (description == null || description.trim().isEmpty()) {
-            throw new FinchException("The description of a ToDo cannot be empty");
+            throw new FinchException("ToDo description cannot be empty");
         }
-        return new ToDo(description.trim());
-    }
-
-    //  Add a Todo
-    public void addTodo(String description) throws FinchException {
-        Task t = createTodo(description);
+        Task t = new ToDo(description.trim());
         tasks.add(t);
+        return t;
     }
 
-    // Helper Deadline method with proper error handling
-    private Deadline createDeadline(String descriptionAndBy) throws FinchException {
-        // Check for required keywords
-        if (!descriptionAndBy.contains(" /by")) {
-            throw new FinchException("Deadline command must include '/by'");
+    public Task addDeadline(String description, String by) throws FinchException {
+        if (description == null || description.trim().isEmpty()) {
+            throw new FinchException("Deadline description cannot be empty");
         }
-
-        String[] parts = descriptionAndBy.split(" /by", 2);
-        String description = parts[0].trim();
-        String by = parts[1].trim();
-
-        if (description.isEmpty()) throw new FinchException("Deadline description cannot be empty");
-        if (by.isEmpty()) throw new FinchException("Deadline date/time cannot be empty");
-
-        return new Deadline(description, by);
-    }
-
-    // Add a Deadline
-    public void addDeadline(String descriptionAndBy) throws FinchException {
-        Task t = createDeadline(descriptionAndBy);
+        if (by == null || by.trim().isEmpty()) {
+            throw new FinchException("Deadline date/time cannot be empty");
+        }
+        Task t = new Deadline(description.trim(), by.trim());
         tasks.add(t);
+        return t;
     }
 
-    // Helper Event method with proper error handling
-    private Event createEvent(String descriptionAndFromTo) throws FinchException {
-        // Check for required keywords
-        if (!descriptionAndFromTo.contains(" /from")) {
-            throw new FinchException("Event command must include '/from'");
+    public Task addEvent(String description, String from, String to) throws FinchException {
+        if (description == null || description.trim().isEmpty()) {
+            throw new FinchException("Event description cannot be empty");
         }
-        if (!descriptionAndFromTo.contains(" /to")) {
-            throw new FinchException("Event command must include '/to'");
+        if (from == null || from.trim().isEmpty() || to == null || to.trim().isEmpty()) {
+            throw new FinchException("Event must have both start (/from) and end (/to) times");
         }
-
-        // Make sure "/from" comes before "/to"
-        int fromIndex = descriptionAndFromTo.indexOf(" /from");
-        int toIndex = descriptionAndFromTo.indexOf(" /to");
-        if (fromIndex > toIndex) {
-            throw new FinchException("'/from' must come before '/to'");
-        }
-
-        // Split input safely
-        String[] parts = descriptionAndFromTo.split(" /from| /to", 3); // Limit 3 parts
-        if (parts.length < 3) {
-            throw new FinchException("Event must have description, /from and /to");
-        }
-
-        String description = parts[0].trim();
-        String from = parts[1].trim();
-        String to = parts[2].trim();
-
-        if (description.isEmpty()) throw new FinchException("Event description cannot be empty");
-        if (from.isEmpty()) throw new FinchException("Event start date/time (/from) cannot be empty");
-        if (to.isEmpty()) throw new FinchException("Event end date/time (/to) cannot be empty");
-
-        return new Event(description, from, to);
-    }
-
-    // Add an Event
-    public void addEvent(String descriptionAndFromTo) throws FinchException {
-        Task t = createEvent(descriptionAndFromTo);
+        Task t = new Event(description.trim(), from.trim(), to.trim());
         tasks.add(t);
+        return t;
     }
 
-    // Delete a task by index
+    // --- Task operations ---
+
     public Task deleteTask(int index) throws FinchException {
-        if (index < 0 || index >= this.tasks.size()) {
-            throw new FinchException("Task number " + (index + 1) + " does not exist!");
-        }
-        return this.tasks.remove(index);
+        validateIndex(index);
+        return tasks.remove(index);
     }
 
-    // Mark as done
     public void markTask(int index) throws FinchException {
-        if (index < 0 || index >= this.tasks.size()) {
-            throw new FinchException("Task number " + (index + 1) + " does not exist!");
-        }
+        validateIndex(index);
         tasks.get(index).markAsDone();
     }
 
-    // Unmark as not done
     public void unmarkTask(int index) throws FinchException {
-        if (index < 0 || index >= this.tasks.size()) {
-            throw new FinchException("Task number " + (index + 1) + " does not exist!");
-        }
+        validateIndex(index);
         tasks.get(index).unmark();
     }
 
-    // Get number of tasks
+    // --- Getters ---
+
     public int size() {
         return tasks.size();
     }
 
-    // Get a task by index
-    public Task getTask(int index) {
-        if (index < 0 || index >= this.tasks.size()) {
-            return null;
-        }
+    public Task getTask(int index) throws FinchException {
+        validateIndex(index);
         return tasks.get(index);
     }
 
-    // Get last added task
-    public Task getLastTask() {
+    public Task getLastTask() throws FinchException {
+        if (tasks.isEmpty()) {
+            throw new FinchException("No tasks in the list.");
+        }
         return tasks.get(tasks.size() - 1);
     }
 
+    public List<Task> getAllTasks() {
+        return Collections.unmodifiableList(tasks); // prevent external modification
+    }
+
+    // --- Helper ---
+
+    private void validateIndex(int index) throws FinchException {
+        if (index < 0 || index >= tasks.size()) {
+            throw new FinchException("Task number " + (index + 1) + " does not exist!");
+        }
+    }
 }
