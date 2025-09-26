@@ -6,74 +6,62 @@ import finch.task.*;
 import java.io.*;
 import java.nio.file.*;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Storage {
-    private final String filePath;
+    private final File file;
 
     public Storage(String filePath) {
-        this.filePath = filePath;
+        this.file = new File(filePath);
+
+        // Ensure parent directory exists
+        File parent = file.getParentFile();
+        if (parent != null && !parent.exists()) {
+            boolean created = parent.mkdirs();
+            if (!created) {
+                System.out.println("⚠ Warning: Could not create directory " + parent.getAbsolutePath());
+            }
+        }
+
+        // Ensure the data file exists
+        try {
+            if (!file.exists()) {
+                boolean createdFile = file.createNewFile();
+                if (!createdFile) {
+                    System.out.println("⚠ Warning: Could not create file " + file.getAbsolutePath());
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to create storage file: " + e.getMessage(), e);
+        }
+    }
+
+    // Save tasks into file
+    public void save(TaskList tasks) throws FinchException {
+        try (FileWriter fw = new FileWriter(file)) {
+            for (int i = 0; i < tasks.size(); i++) {
+                fw.write(tasks.getTask(i).encode() + System.lineSeparator());
+            }
+        } catch (IOException e) {
+            throw new FinchException("Failed to save tasks: " + e.getMessage());
+        }
     }
 
     // Load tasks from file
-    public ArrayList<Task> load() throws FinchException {
-        ArrayList<Task> tasks = new ArrayList<>();
-
-        try {
-            Path path = Paths.get(filePath);
-
-            if (!Files.exists(path)) {
-                // Create folder if it doesn't exist
-                if (path.getParent() != null) {
-                    Files.createDirectories(path.getParent());
-                }
-                Files.createFile(path);
-                return tasks; // return empty list
+    public TaskList load() throws FinchException {
+        ArrayList<Task> taskList = new ArrayList<>();
+        try (Scanner sc = new Scanner(file)) {
+            while (sc.hasNextLine()) {
+                String line = sc.nextLine();
+                Task task = Task.decode(line);
+                taskList.add(task);
             }
-
-            BufferedReader reader = new BufferedReader(new FileReader(filePath));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(" \\| ");
-                String type = parts[0];
-                boolean isDone = parts[1].equals("1");
-
-                Task task;
-                switch (type) {
-                case "T":
-                    task = new ToDo(parts[2]);
-                    break;
-                case "D":
-                    task = new Deadline(parts[2], parts[3]);
-                    break;
-                case "E":
-                    task = new Event(parts[2], parts[3], parts[4]);
-                    break;
-                default:
-                    throw new FinchException("Corrupted task type in file: " + type);
-                }
-
-                if (isDone) {
-                    task.markAsDone();
-                }
-                tasks.add(task);
-            }
-            reader.close();
-        } catch (IOException e) {
-            throw new FinchException("Error loading tasks from file: " + e.getMessage());
+        } catch (FileNotFoundException e) {
+            // If file doesn't exist, just return an empty TaskList
+            return new TaskList();
+        } catch (Exception e) {
+            throw new FinchException("Failed to load tasks: " + e.getMessage());
         }
-
-        return tasks;
-    }
-
-    // Save tasks to file
-    public void save(ArrayList<Task> tasks) throws FinchException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
-            for (Task task : tasks) {
-                writer.write(task.toSaveFormat());
-                writer.newLine();
-            }
-        } catch (IOException e) {
-            throw new FinchException("Error saving tasks to file: " + e.getMessage());
-        }
+        return new TaskList(taskList);
     }
 }

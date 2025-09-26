@@ -19,4 +19,9 @@ public class Event extends Task {
     public String toSaveFormat() {
         return "E | " + (isDone ? "1" : "0") + " | " + description + " | " + from + " | " + to;
     }
+
+    @Override
+    public String encode() {
+        return "E | " + (isDone ? "1" : "0") + " | " + description + " | " + from + " | " + to;
+    }
 }
