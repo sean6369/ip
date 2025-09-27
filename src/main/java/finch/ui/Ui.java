@@ -38,8 +38,8 @@ public class Ui {
         showLine();
     }
 
-    public String readCommand(Scanner sc) {
-        return sc.nextLine();
+    public String readCommand() {
+        return scanner.nextLine();
     }
 
     // Show goodbye message
@@ -68,7 +68,6 @@ public class Ui {
             }
         }
     }
-
 
     // Show added task
     public void showAdded(Task task, int totalTasks) {

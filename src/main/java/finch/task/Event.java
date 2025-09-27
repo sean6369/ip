@@ -4,7 +4,6 @@ import finch.exception.FinchException;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 
 public class Event extends Task {
 
@@ -14,28 +13,7 @@ public class Event extends Task {
             DateTimeFormatter.ofPattern("MMM d yyyy, h:mm a");
     // Example: Sep 26 2025, 2:00pm
 
-    // Constructor 1: accept date strings ("yyyy-MM-dd HH:mm")
-    public Event(String description, String fromString, String toString) throws FinchException {
-        super(description);
-
-        if (fromString == null || fromString.trim().isEmpty() ||
-                toString == null || toString.trim().isEmpty()) {
-            throw new FinchException("Event must have both start (/from) and end (/to) date/times.");
-        }
-
-        try {
-            this.from = LocalDateTime.parse(fromString.trim().replace(" ", "T"));
-            this.to = LocalDateTime.parse(toString.trim().replace(" ", "T"));
-        } catch (DateTimeParseException e) {
-            throw new FinchException("Invalid date/time format. Use yyyy-MM-dd HH:mm (e.g., 2025-09-26 14:00).");
-        }
-
-        if (from.isAfter(to)) {
-            throw new FinchException("Event start date/time must be on or before the end date/time.");
-        }
-    }
-
-    // Constructor 2: accept LocalDateTime objects directly
+    // Constructor
     public Event(String description, LocalDateTime from, LocalDateTime to) throws FinchException {
         super(description);
 
@@ -66,13 +44,5 @@ public class Event extends Task {
     @Override
     public String encode() {
         return toSaveFormat();
-    }
-
-    public LocalDateTime getFromDateTime() {
-        return from;
-    }
-
-    public LocalDateTime getToDateTime() {
-        return to;
     }
 }

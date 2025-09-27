@@ -6,7 +6,6 @@ import finch.task.*;
 import java.io.*;
 import java.nio.file.*;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 public class Storage {
     private final File file;

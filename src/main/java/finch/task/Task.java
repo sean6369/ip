@@ -2,6 +2,9 @@ package finch.task;
 
 import finch.exception.FinchException;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
+
 public abstract class Task {
     protected String description;
     protected boolean isDone;
@@ -33,18 +36,27 @@ public abstract class Task {
         boolean isDone = parts[1].equals("1");
 
         Task task;
-        switch (type) {
-        case "T":
-            task = new ToDo(parts[2]);
-            break;
-        case "D":
-            task = new Deadline(parts[2], parts[3]);
-            break;
-        case "E":
-            task = new Event(parts[2], parts[3], parts[4]);
-            break;
-        default:
-            throw new FinchException("Corrupted task type in file: " + type);
+        try {
+            switch (type) {
+            case "T":
+                task = new ToDo(parts[2]);
+                break;
+            case "D":
+                // parts[3] is ISO string like "2025-09-26T18:00"
+                LocalDateTime deadlineDateTime = LocalDateTime.parse(parts[3]);
+                task = new Deadline(parts[2], deadlineDateTime);
+                break;
+            case "E":
+                // parts[3] and parts[4] are ISO strings like "2025-09-26T14:00"
+                LocalDateTime fromDateTime = LocalDateTime.parse(parts[3]);
+                LocalDateTime toDateTime = LocalDateTime.parse(parts[4]);
+                task = new Event(parts[2], fromDateTime, toDateTime);
+                break;
+            default:
+                throw new FinchException("Corrupted task type in file: " + type);
+            }
+        } catch (DateTimeParseException e) {
+            throw new FinchException("Invalid date format found in saved file: " + e.getMessage());
         }
 
         if (isDone) {
@@ -59,5 +71,4 @@ public abstract class Task {
     }
 
     public abstract String toSaveFormat();
-
 }

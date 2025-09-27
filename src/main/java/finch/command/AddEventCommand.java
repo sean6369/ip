@@ -1,6 +1,5 @@
 package finch.command;
 
-import finch.task.Event;
 import finch.task.Task;
 import finch.task.TaskList;
 import finch.ui.Ui;
@@ -74,8 +73,7 @@ public class AddEventCommand extends Command {
 
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) throws FinchException {
-        Task t = new Event(description, from, to);
-        tasks.addEvent(description, from.toString(), to.toString()); // saves ISO format for compatibility
+        Task t = tasks.addEvent(description, from, to);
         ui.showAdded(t, tasks.size());
         storage.save(tasks);
     }

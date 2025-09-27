@@ -2,9 +2,8 @@ package finch.task;
 
 import finch.exception.FinchException;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 public class TaskList {
     private final ArrayList<Task> tasks;
@@ -30,26 +29,29 @@ public class TaskList {
         return t;
     }
 
-    public Task addDeadline(String description, String by) throws FinchException {
+    public Task addDeadline(String description, LocalDateTime by) throws FinchException {
         if (description == null || description.trim().isEmpty()) {
             throw new FinchException("Deadline description cannot be empty");
         }
-        if (by == null || by.trim().isEmpty()) {
-            throw new FinchException("Deadline date/time cannot be empty");
+        if (by == null) {
+            throw new FinchException("Deadline date/time cannot be null");
         }
-        Task t = new Deadline(description.trim(), by.trim());
+        Task t = new Deadline(description.trim(), by);
         tasks.add(t);
         return t;
     }
 
-    public Task addEvent(String description, String from, String to) throws FinchException {
+    public Task addEvent(String description, LocalDateTime from, LocalDateTime to) throws FinchException {
         if (description == null || description.trim().isEmpty()) {
             throw new FinchException("Event description cannot be empty");
         }
-        if (from == null || from.trim().isEmpty() || to == null || to.trim().isEmpty()) {
+        if (from == null || to == null) {
             throw new FinchException("Event must have both start (/from) and end (/to) times");
         }
-        Task t = new Event(description.trim(), from.trim(), to.trim());
+        if (to.isBefore(from)) {
+            throw new FinchException("Event end time cannot be before start time");
+        }
+        Task t = new Event(description.trim(), from, to);
         tasks.add(t);
         return t;
     }
@@ -80,17 +82,6 @@ public class TaskList {
     public Task getTask(int index) throws FinchException {
         validateIndex(index);
         return tasks.get(index);
-    }
-
-    public Task getLastTask() throws FinchException {
-        if (tasks.isEmpty()) {
-            throw new FinchException("No tasks in the list.");
-        }
-        return tasks.get(tasks.size() - 1);
-    }
-
-    public List<Task> getAllTasks() {
-        return Collections.unmodifiableList(tasks); // prevent external modification
     }
 
     // --- Helper ---

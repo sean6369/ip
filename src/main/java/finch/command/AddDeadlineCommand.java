@@ -1,6 +1,5 @@
 package finch.command;
 
-import finch.task.Deadline;
 import finch.task.Task;
 import finch.task.TaskList;
 import finch.ui.Ui;
@@ -49,8 +48,7 @@ public class AddDeadlineCommand extends Command {
 
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) throws FinchException {
-        Task t = new Deadline(description, by); // now uses LocalDateTime constructor
-        tasks.addDeadline(description, by.toString()); // keep TaskList compatibility (saves ISO string)
+        Task t = tasks.addDeadline(description, by);
         ui.showAdded(t, tasks.size());
         storage.save(tasks);
     }

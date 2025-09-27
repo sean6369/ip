@@ -7,8 +7,6 @@ import finch.parser.Parser;
 import finch.ui.Ui;
 import finch.command.Command;
 
-import java.util.Scanner;
-
 public class Finch {
 
     // Handles reading from and writing to the data file (persistent storage for tasks)
@@ -46,33 +44,26 @@ public class Finch {
         ui.showWelcomeMessage();
         boolean isExit = false;
 
-        try (Scanner sc = new Scanner(System.in)) { // try-with-resources ensures scanner closes automatically
-            while (!isExit) {
-                String fullCommand;
-                try {
-                    // Read user input
-                    fullCommand = ui.readCommand(sc);
+        while (!isExit) {
+            try {
+                // Read user input directly using Ui
+                String fullCommand = ui.readCommand();
 
-                    // Show divider line
-                    ui.showLine();
+                ui.showLine();
 
-                    // Parse and execute command
-                    Command command = Parser.parse(fullCommand);
-                    command.execute(tasks, ui, storage);
+                // Parse and execute command
+                Command command = Parser.parse(fullCommand);
+                command.execute(tasks, ui, storage);
 
-                    // Check if command indicates exit
-                    isExit = command.isExit();
+                // Check exit condition
+                isExit = command.isExit();
 
-                } catch (FinchException e) {
-                    // Handle all known Finch exceptions gracefully
-                    ui.showError(e.getMessage());
-                } catch (Exception e) {
-                    // Catch any unexpected runtime errors to prevent crash
-                    ui.showError("Unexpected error: " + e.getMessage());
-                } finally {
-                    // Always show a line after each command
-                    ui.showLine();
-                }
+            } catch (FinchException e) {
+                ui.showError(e.getMessage());
+            } catch (Exception e) {
+                ui.showError("Unexpected error: " + e.getMessage());
+            } finally {
+                ui.showLine();
             }
         }
     }
