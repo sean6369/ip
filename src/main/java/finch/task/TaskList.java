@@ -4,6 +4,7 @@ import finch.exception.FinchException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 public class TaskList {
     private final ArrayList<Task> tasks;
@@ -82,6 +83,21 @@ public class TaskList {
     public Task getTask(int index) throws FinchException {
         validateIndex(index);
         return tasks.get(index);
+    }
+
+    // --- Find tasks by keyword ---
+    public List<Task> findTasks(String keyword) throws FinchException {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            throw new FinchException("Keyword cannot be empty");
+        }
+
+        List<Task> results = new ArrayList<>();
+        for (Task t : tasks) {
+            if (t.description.toLowerCase().contains(keyword.toLowerCase())) {
+                results.add(t);
+            }
+        }
+        return results;
     }
 
     // --- Helper ---
