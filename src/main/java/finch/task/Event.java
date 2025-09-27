@@ -28,6 +28,7 @@ public class Event extends Task {
         this.to = to;
     }
 
+    // Returns a string representation of the Event task for display
     @Override
     public String toString() {
         return "[E]" + super.toString()
@@ -35,12 +36,14 @@ public class Event extends Task {
                 + ", to: " + to.format(DISPLAY_FORMATTER).replace("AM", "am").replace("PM", "pm") + ")";
     }
 
+    // Returns a string representation of the Event task for saving to file
     @Override
     public String toSaveFormat() {
         return "E | " + (isDone ? "1" : "0") + " | " + description
                 + " | " + from + " | " + to;
     }
 
+    // Encodes the Event task for storage
     @Override
     public String encode() {
         return toSaveFormat();

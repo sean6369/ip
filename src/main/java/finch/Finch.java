@@ -68,6 +68,7 @@ public class Finch {
         }
     }
 
+    // Main entry point for the Finch application
     public static void main(String[] args) {
         new Finch("data/tasks.txt").run();
     }

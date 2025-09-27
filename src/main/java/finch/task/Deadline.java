@@ -24,6 +24,7 @@ public class Deadline extends Task {
         this.by = by;
     }
 
+    // Returns a string representation of the Deadline task for display
     @Override
     public String toString() {
         // Format to e.g. "Sep 26 2025, 6:30pm"
@@ -34,11 +35,13 @@ public class Deadline extends Task {
                 + ")";
     }
 
+    // Returns a string representation of the Deadline task for saving to file
     @Override
     public String toSaveFormat() {
         return "D | " + (isDone ? "1" : "0") + " | " + description + " | " + by;
     }
 
+    // Encodes the Deadline for storage
     @Override
     public String encode() {
         return toSaveFormat();

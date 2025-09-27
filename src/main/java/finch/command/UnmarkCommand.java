@@ -9,6 +9,7 @@ import finch.exception.FinchException;
 public class UnmarkCommand extends Command {
     private final int index;
 
+    // Constructs a UnmarkCommand for the specified task index
     public UnmarkCommand(String argument) throws FinchException {
         try {
             this.index = Integer.parseInt(argument.trim()) - 1;
@@ -17,6 +18,7 @@ public class UnmarkCommand extends Command {
         }
     }
 
+    // Executes the unmark command: unmark the task at the given index as not done, and shows a confirmation message to the user
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) throws FinchException {
         Task t = tasks.getTask(index);
@@ -26,6 +28,7 @@ public class UnmarkCommand extends Command {
         storage.save(tasks);
     }
 
+    // Indicates whether this command exits the program
     @Override
     public boolean isExit() {
         return false;

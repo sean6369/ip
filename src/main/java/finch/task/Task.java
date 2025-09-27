@@ -6,30 +6,38 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 
 public abstract class Task {
+
+    // The task description provided by the user
     protected String description;
+
+    // Boolean flag indicating whether the task is done
     protected boolean isDone;
 
+    // Constructs a new task with the given description and the task is initially not done
     public Task(String description) {
         this.description = description;
         this.isDone = false;
     }
 
+    // Returns the status icon for the task, "X" for done, " " (space) for not done
     public String getStatusIcon() {
         return (isDone ? "X" : " "); // mark done task with X
     }
 
+    // Marks the task as done
     public void markAsDone() {
         isDone = true;
     }
 
+    // Marks the task as not done
     public void unmark() {
         isDone = false;
     }
 
-    // Encode for saving to file
+    // Encodes the task into a string format suitable for saving to file
     public abstract String encode();
 
-    // Decode from file
+    // Decodes a line from a saved file and returns the corresponding Task object
     public static Task decode(String line) throws FinchException {
         String[] parts = line.split(" \\| ");
         String type = parts[0];
@@ -65,10 +73,12 @@ public abstract class Task {
         return task;
     }
 
+    // Returns a string representation of the task, including the status icon and description
     @Override
     public String toString() {
         return "[" + getStatusIcon() + "] " + description;
     }
 
+    // Converts the task into a format suitable for saving in a file
     public abstract String toSaveFormat();
 }

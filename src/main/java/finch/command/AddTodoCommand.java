@@ -9,6 +9,7 @@ import finch.exception.FinchException;
 public class AddTodoCommand extends Command {
     private final String description;
 
+    // Constructs an AddTodoCommand by parsing the user input
     public AddTodoCommand(String arguments) throws FinchException {
         if (arguments == null || arguments.trim().isEmpty()) {
             throw new FinchException("ToDo command must have a description: todo <desc>");
@@ -16,6 +17,7 @@ public class AddTodoCommand extends Command {
         this.description = arguments.trim();
     }
 
+    // Executes the command: adds the ToDo task to the TaskList, shows confirmation, and saves to storage
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) throws FinchException {
         Task t = tasks.addTodo(description);
@@ -23,6 +25,7 @@ public class AddTodoCommand extends Command {
         storage.save(tasks);
     }
 
+    // Indicates whether this command exits the program
     @Override
     public boolean isExit() {
         return false;

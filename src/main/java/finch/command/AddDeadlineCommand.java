@@ -14,6 +14,7 @@ public class AddDeadlineCommand extends Command {
     private final String description;
     private final LocalDateTime by;
 
+    // Constructs an AddDeadlineCommand by parsing the user input
     public AddDeadlineCommand(String arguments) throws FinchException {
         if (arguments == null || arguments.trim().isEmpty()) {
             throw new FinchException("Deadline command must be in this format: deadline <desc> /by <yyyy-MM-dd HH:mm>");
@@ -46,6 +47,7 @@ public class AddDeadlineCommand extends Command {
         }
     }
 
+    // Excutes the command: adds the Deadline task to the Tasklist, shows confirmation, and saves to storage
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) throws FinchException {
         Task t = tasks.addDeadline(description, by);
@@ -53,6 +55,7 @@ public class AddDeadlineCommand extends Command {
         storage.save(tasks);
     }
 
+    // Indicates whether this command exits the program
     @Override
     public boolean isExit() {
         return false;
