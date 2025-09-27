@@ -3,7 +3,6 @@ package finch.parser;
 import finch.command.*;
 import finch.exception.FinchException;
 
-
 public class Parser {
 
     public static Command parse(String fullCommand) throws FinchException {
@@ -23,6 +22,7 @@ public class Parser {
             case "mark" -> new MarkCommand(arguments);
             case "unmark" -> new UnmarkCommand(arguments);
             case "delete" -> new DeleteCommand(arguments);
+            case "find" -> new FindCommand(arguments); // <-- NEW
             case "bye" -> new ExitCommand();
             default -> new UnknownCommand(commandWord);
         };
