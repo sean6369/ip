@@ -9,6 +9,7 @@ import finch.exception.FinchException;
 public class DeleteCommand extends Command {
     private final int index;
 
+    // Constructs a DeleteCommand by parsing the task number from user input
     public DeleteCommand(String argument) throws FinchException {
         try {
             this.index = Integer.parseInt(argument.trim()) - 1;
@@ -17,6 +18,7 @@ public class DeleteCommand extends Command {
         }
     }
 
+    // Executes the command: deletes the specified task from the TaskList, shows confirmation, and saves to storage
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) throws FinchException {
         Task removed = tasks.deleteTask(index);
@@ -24,6 +26,7 @@ public class DeleteCommand extends Command {
         storage.save(tasks);
     }
 
+    // Indicates whether this command exits the program
     @Override
     public boolean isExit() {
         return false;

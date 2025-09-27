@@ -7,9 +7,13 @@ import java.io.*;
 import java.nio.file.*;
 import java.util.ArrayList;
 
+/**
+ * Handles reading from and writing to the storage file for tasks.
+ */
 public class Storage {
     private final File file;
 
+    // Initialises the Storage with the given file path and ensures that the parent directory and data file exist
     public Storage(String filePath) throws FinchException {
         this.file = new File(filePath);
 
@@ -35,6 +39,7 @@ public class Storage {
         }
     }
 
+    // Saves all task from TaskList into the storage file
     public void save(TaskList tasks) throws FinchException {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
             for (int i = 0; i < tasks.size(); i++) {
@@ -46,7 +51,7 @@ public class Storage {
         }
     }
 
-    // Load tasks from file
+    // Load tasks from the storage file into a TaskList
     public TaskList load() throws FinchException {
         ArrayList<Task> taskList = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {

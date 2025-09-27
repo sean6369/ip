@@ -15,6 +15,7 @@ public class AddEventCommand extends Command {
     private final LocalDateTime from;
     private final LocalDateTime to;
 
+    // Constructs an AddEventCommand by parsing the user input
     public AddEventCommand(String arguments) throws FinchException {
         if (arguments == null || arguments.trim().isEmpty()) {
             throw new FinchException("Event command must be in this format: event <desc> /from <yyyy-MM-dd HH:mm> /to <yyyy-MM-dd HH:mm>");
@@ -71,6 +72,7 @@ public class AddEventCommand extends Command {
         }
     }
 
+    // Executes the command: adds the Event task to the TaskList, shows confirmation, and saves to storage
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) throws FinchException {
         Task t = tasks.addEvent(description, from, to);
@@ -78,6 +80,7 @@ public class AddEventCommand extends Command {
         storage.save(tasks);
     }
 
+    // Indicates whether this command exits the program
     @Override
     public boolean isExit() {
         return false;

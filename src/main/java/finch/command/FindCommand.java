@@ -11,6 +11,7 @@ public class FindCommand extends Command {
 
     private final String keyword;
 
+    // Constructs a FindCommand with the specified search keyword
     public FindCommand(String keyword) throws FinchException {
         if (keyword == null || keyword.trim().isEmpty()) {
             throw new FinchException("Keyword cannot be empty.");
@@ -18,6 +19,7 @@ public class FindCommand extends Command {
         this.keyword = keyword.trim();
     }
 
+    // Executes the find command: searches for tasks containing the keyword, then prints the matching tasks to the user
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) throws FinchException {
         List<Task> results = tasks.findTasks(keyword);
@@ -32,6 +34,7 @@ public class FindCommand extends Command {
         }
     }
 
+    // Indicates whether this command exits the program
     @Override
     public boolean isExit() {
         return false;

@@ -12,6 +12,7 @@ public class ListCommand extends Command {
         ui.showTasks(tasks);
     }
 
+    // Indicates whether this command exits the program
     @Override
     public boolean isExit() {
         return false; // Adding a todo does not exit the app
