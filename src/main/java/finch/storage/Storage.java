@@ -54,17 +54,18 @@ public class Storage {
     /**
      * Saves all tasks from the given {@link TaskList} to the storage file.
      * <p>
-     * Each task is written in its encoded format (as returned by
-     * {@link Task#encode()}) on a separate line.
+     * Each task is written in its save format (as returned by
+     * {@link Task#toSaveFormat()}) on a separate line. This format is designed
+     * to be reloadable by {@link #load()} to reconstruct the task list.
      *
      * @param tasks the {@link TaskList} containing all tasks to be saved
      * @throws FinchException if an I/O error occurs during saving
      */
     public void save(TaskList tasks) throws FinchException {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
-            // Loop through all tasks in the list and write their encoded form
+            // Loop through all tasks in the list and write their save format
             for (int i = 0; i < tasks.size(); i++) {
-                bw.write(tasks.getTask(i).encode());
+                bw.write(tasks.getTask(i).toSaveFormat());
                 bw.newLine(); // Write each task on a new line
             }
         } catch (IOException e) {

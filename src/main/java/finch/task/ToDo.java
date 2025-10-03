@@ -23,10 +23,4 @@ public class ToDo extends Task {
     public String toSaveFormat() {
         return "T | " + (isDone ? "1" : "0") + " | " + description;
     }
-
-    // Encodes the Todo Task for storage
-    @Override
-    public String encode() {
-        return "T | " + (isDone ? "1" : "0") + " | " + description;
-    }
 }

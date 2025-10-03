@@ -59,14 +59,4 @@ public class DeleteCommand extends Command {
         ui.showDeleted(removed, tasks.size());
         storage.save(tasks);
     }
-
-    /**
-     * Indicates whether this command exits the program.
-     *
-     * @return {@code false} as this command does not terminate the program
-     */
-    @Override
-    public boolean isExit() {
-        return false;
-    }
 }

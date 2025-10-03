@@ -9,6 +9,7 @@ public abstract class Command {
     // Execute the command
     public abstract void execute(TaskList tasks, Ui ui, Storage storage) throws FinchException;
 
-    // Does this command signal exiting the app?
-    public abstract boolean isExit();
+    public boolean isExit() {
+        return false;
+    }
 }

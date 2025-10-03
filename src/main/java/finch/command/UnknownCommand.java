@@ -20,10 +20,4 @@ public class UnknownCommand extends Command {
         ui.showLine();
         ui.showCommands();
     }
-
-    // Indicates whether this command exits the program
-    @Override
-    public boolean isExit() {
-        return false;
-    }
 }

@@ -53,17 +53,17 @@ Finch supports the following types of tasks:
 
 ## Command Summary
 
-| Command | Description | Example |
-|---------|-------------|---------|
-| `todo <desc>` | Add a ToDo task | `todo Read book` |
-| `deadline <desc> /by <yyyy-MM-dd HH:mm>` | Add a Deadline task | `deadline Submit report /by 2025-09-27 18:00` |
-| `event <desc> /from <yyyy-MM-dd HH:mm> /to <yyyy-MM-dd HH:mm>` | Add an Event task | `event Team meeting /from 2025-09-28 14:00 /to 2025-09-28 15:30` |
-| `list` | List all tasks | `list` |
-| `mark <number>` | Mark task as done | `mark 2` |
-| `unmark <number>` | Mark task as not done | `unmark 2` |
-| `delete <number>` | Delete a task | `delete 3` |
-| `find <keyword>` | Search tasks | `find book` |
-| `bye` | Exit Finch | `bye` |
+| Command                                                        | Description           | Example                                                          |
+|----------------------------------------------------------------|-----------------------|------------------------------------------------------------------|
+| `todo <desc>`                                                  | Add a ToDo task       | `todo Read book`                                                 |
+| `deadline <desc> /by <yyyy-MM-dd HH:mm>`                       | Add a Deadline task   | `deadline Submit report /by 2025-09-27 18:00`                    |
+| `event <desc> /from <yyyy-MM-dd HH:mm> /to <yyyy-MM-dd HH:mm>` | Add an Event task     | `event Team meeting /from 2025-09-28 14:00 /to 2025-09-28 15:30` |
+| `list`                                                         | List all tasks        | `list`                                                           |
+| `mark <number>`                                                | Mark task as done     | `mark 2`                                                         |
+| `unmark <number>`                                              | Mark task as not done | `unmark 2`                                                       |
+| `delete <number>`                                              | Delete a task         | `delete 3`                                                       |
+| `find <keyword>`                                               | Search tasks          | `find book`                                                      |
+| `bye`                                                          | Exit Finch            | `bye`                                                            |
 
 ---
 

@@ -3,6 +3,7 @@ package finch.task;
 import finch.exception.FinchException;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 /**
@@ -49,15 +50,6 @@ public abstract class Task {
     public void unmark() {
         isDone = false;
     }
-
-    /**
-     * Encodes this task into a string representation suitable for saving to file.
-     * <p>
-     * Implemented by subclasses to provide their own save format.
-     *
-     * @return a string representation of the task for storage
-     */
-    public abstract String encode();
 
     /**
      * Decodes a task from a saved file line into the corresponding {@link Task} object.
@@ -119,11 +111,20 @@ public abstract class Task {
     }
 
     /**
-     * Converts this task into a saveable format for persistent storage.
+     * Converts this task into a savable format for persistent storage.
      * <p>
      * Implemented by subclasses to define their own file format.
      *
      * @return a string representation of the task suitable for storage
      */
     public abstract String toSaveFormat();
+
+    protected static final DateTimeFormatter DISPLAY_FORMATTER =
+            DateTimeFormatter.ofPattern("MMM d yyyy, h:mm a");
+
+    protected static String formatDateTime(LocalDateTime dt) {
+        return dt.format(DISPLAY_FORMATTER)
+                .replace("AM", "am")
+                .replace("PM", "pm");
+    }
 }

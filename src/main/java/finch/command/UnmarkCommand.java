@@ -27,10 +27,4 @@ public class UnmarkCommand extends Command {
         ui.showUnmarked(t);
         storage.save(tasks);
     }
-
-    // Indicates whether this command exits the program
-    @Override
-    public boolean isExit() {
-        return false;
-    }
 }

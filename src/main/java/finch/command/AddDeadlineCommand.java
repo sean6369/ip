@@ -40,7 +40,7 @@ public class AddDeadlineCommand extends Command {
      */
     public AddDeadlineCommand(String arguments) throws FinchException {
         if (arguments == null || arguments.trim().isEmpty()) {
-            throw new FinchException("Deadline command must be in this format: deadline <desc> /by <yyyy-MM-dd HH:mm>");
+            throw new FinchException("Deadline command cannot be emtpy. Format: deadline <desc> /by <yyyy-MM-dd HH:mm>");
         }
 
         if (!arguments.contains("/by")) {
@@ -61,9 +61,8 @@ public class AddDeadlineCommand extends Command {
 
         this.description = descriptionPart;
 
-        // Parse into LocalDateTime
+        // Parse date + time
         try {
-            // Convert "2025-09-26 18:00" → "2025-09-26T18:00" so LocalDateTime can parse
             this.by = LocalDateTime.parse(byPart.replace(" ", "T"));
         } catch (DateTimeParseException e) {
             throw new FinchException("Invalid date/time format. Use yyyy-MM-dd HH:mm (e.g., 2025-09-26 18:00).");
@@ -88,15 +87,5 @@ public class AddDeadlineCommand extends Command {
         Task t = tasks.addDeadline(description, by);
         ui.showAdded(t, tasks.size());
         storage.save(tasks);
-    }
-
-    /**
-     * Indicates whether this command exits the program.
-     *
-     * @return {@code false} as this command does not terminate the program
-     */
-    @Override
-    public boolean isExit() {
-        return false;
     }
 }

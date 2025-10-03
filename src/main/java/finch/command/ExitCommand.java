@@ -12,7 +12,6 @@ public class ExitCommand extends Command {
         ui.showGoodbye();
     }
 
-    // Indicates whether this command exits the program
     @Override
     public boolean isExit() {
         return true; // Signals the app to exit

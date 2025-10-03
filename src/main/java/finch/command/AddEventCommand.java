@@ -7,7 +7,6 @@ import finch.storage.Storage;
 import finch.exception.FinchException;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeParseException;
 
 /**
  * Represents the command to add an {@code Event} task in the Finch application.
@@ -36,62 +35,55 @@ public class AddEventCommand extends Command {
      * Constructs an {@code AddEventCommand} by parsing and validating the user input.
      *
      * @param arguments the raw argument string provided by the user
-     * @throws FinchException if the input is empty, missing required fields,
-     *                        has invalid date formats, or has inconsistent dates
+     * @throws FinchException if the input is empty, missing '/from' or '/to', has invalid date format,
+     *                        or if description/date fields are empty
      */
     public AddEventCommand(String arguments) throws FinchException {
         if (arguments == null || arguments.trim().isEmpty()) {
-            throw new FinchException("Event command must be in this format: event <desc> /from <yyyy-MM-dd HH:mm> /to <yyyy-MM-dd HH:mm>");
+            throw new FinchException("Event command cannot be empty. Format: event <desc> /from <start> /to <end>");
         }
 
         // Ensure both /from and /to exist
         if (!arguments.contains("/from") || !arguments.contains("/to")) {
-            throw new FinchException("Event command must contain '/from <start>' and '/to <end>'");
+            throw new FinchException("Event command must contain both '/from <start>' and '/to <end>'");
         }
 
-        // Ensure /from comes before /to
-        if (arguments.indexOf("/from") > arguments.indexOf("/to")) {
+        // Split /from and /to
+        int indexFrom = arguments.indexOf("/from");
+        int indexTo = arguments.indexOf("/to");
+        if (indexFrom > indexTo) {
             throw new FinchException("'/from' must come before '/to'");
         }
 
         // Split description and dates
         String[] parts = arguments.split("/from", 2);
+
         String descriptionPart = parts[0].trim();
         String remaining = parts[1].trim();
 
         String[] fromToParts = remaining.split("/to", 2);
-        if (fromToParts.length < 2) {
-            throw new FinchException("Event command must contain both '/from <start>' and '/to <end>'");
-        }
 
         String fromPart = fromToParts[0].trim();
         String toPart = fromToParts[1].trim();
 
-        // Validate non-empty fields
         if (descriptionPart.isEmpty()) {
-            throw new FinchException("Event description cannot be empty.");
+            throw new FinchException("Event description cannot be empty");
         }
         if (fromPart.isEmpty()) {
-            throw new FinchException("Event start date/time (/from) cannot be empty.");
+            throw new FinchException("Event start date/time (/from) cannot be empty");
         }
         if (toPart.isEmpty()) {
-            throw new FinchException("Event end date/time (/to) cannot be empty.");
+            throw new FinchException("Event end date/time (/to) cannot be empty");
         }
 
         this.description = descriptionPart;
 
-        // Parse date + time into LocalDateTime
+        // Parse date + time
         try {
-            // Convert "2025-09-26 14:00" → "2025-09-26T14:00" for LocalDateTime.parse
             this.from = LocalDateTime.parse(fromPart.replace(" ", "T"));
             this.to = LocalDateTime.parse(toPart.replace(" ", "T"));
-        } catch (DateTimeParseException e) {
-            throw new FinchException("Invalid date/time format. Use yyyy-MM-dd HH:mm (e.g., 2025-09-26 14:00).");
-        }
-
-        // Ensure start <= end
-        if (to.isBefore(from)) {
-            throw new FinchException("Event end date/time cannot be before start date/time.");
+        } catch (Exception e) {
+            throw new FinchException("Invalid date/time format. Use yyyy-MM-dd HH:mm (e.g., 2025-09-26 14:00)");
         }
     }
 
@@ -113,15 +105,5 @@ public class AddEventCommand extends Command {
         Task t = tasks.addEvent(description, from, to);
         ui.showAdded(t, tasks.size());
         storage.save(tasks);
-    }
-
-    /**
-     * Indicates whether this command exits the program.
-     *
-     * @return {@code false} as this command does not terminate the program
-     */
-    @Override
-    public boolean isExit() {
-        return false;
     }
 }

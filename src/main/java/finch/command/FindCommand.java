@@ -33,10 +33,4 @@ public class FindCommand extends Command {
             }
         }
     }
-
-    // Indicates whether this command exits the program
-    @Override
-    public boolean isExit() {
-        return false;
-    }
 }
