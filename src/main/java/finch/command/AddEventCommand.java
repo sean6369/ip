@@ -9,13 +9,36 @@ import finch.exception.FinchException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 
+/**
+ * Represents the command to add an {@code Event} task in the Finch application.
+ * <p>
+ * The {@code AddEventCommand} parses user input, validates the description and
+ * start/end times, and when executed, adds the event task into the {@link TaskList},
+ * displays confirmation via the {@link Ui}, and saves the updated task list to {@link Storage}.
+ * </p>
+ *
+ * <p><b>Expected input format:</b></p>
+ * <pre>
+ *     event &lt;desc&gt; /from yyyy-MM-dd HH:mm /to yyyy-MM-dd HH:mm
+ * </pre>
+ * Example:
+ * <pre>
+ *     event project meeting /from 2025-09-26 14:00 /to 2025-09-26 16:00
+ * </pre>
+ */
 public class AddEventCommand extends Command {
 
     private final String description;
     private final LocalDateTime from;
     private final LocalDateTime to;
 
-    // Constructs an AddEventCommand by parsing the user input
+    /**
+     * Constructs an {@code AddEventCommand} by parsing and validating the user input.
+     *
+     * @param arguments the raw argument string provided by the user
+     * @throws FinchException if the input is empty, missing required fields,
+     *                        has invalid date formats, or has inconsistent dates
+     */
     public AddEventCommand(String arguments) throws FinchException {
         if (arguments == null || arguments.trim().isEmpty()) {
             throw new FinchException("Event command must be in this format: event <desc> /from <yyyy-MM-dd HH:mm> /to <yyyy-MM-dd HH:mm>");
@@ -72,7 +95,19 @@ public class AddEventCommand extends Command {
         }
     }
 
-    // Executes the command: adds the Event task to the TaskList, shows confirmation, and saves to storage
+    /**
+     * Executes the command by adding a new {@code Event} task to the task list.
+     * <ul>
+     *   <li>Creates and appends an {@code Event} task with the given description and time range</li>
+     *   <li>Displays a confirmation message to the user</li>
+     *   <li>Saves the updated task list to persistent storage</li>
+     * </ul>
+     *
+     * @param tasks   the {@link TaskList} to which the task is added
+     * @param ui      the {@link Ui} for showing feedback to the user
+     * @param storage the {@link Storage} for saving the updated task list
+     * @throws FinchException if saving fails or if task creation is invalid
+     */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) throws FinchException {
         Task t = tasks.addEvent(description, from, to);
@@ -80,7 +115,11 @@ public class AddEventCommand extends Command {
         storage.save(tasks);
     }
 
-    // Indicates whether this command exits the program
+    /**
+     * Indicates whether this command exits the program.
+     *
+     * @return {@code false} as this command does not terminate the program
+     */
     @Override
     public boolean isExit() {
         return false;

@@ -7,6 +7,12 @@ import finch.parser.Parser;
 import finch.ui.Ui;
 import finch.command.Command;
 
+/**
+ * The main application class for Finch, a command-line task management chatbot.
+ * <p>
+ * Finch handles loading and saving tasks from persistent storage, processing
+ * user commands, and interacting with the user via the {@link Ui} class.
+ */
 public class Finch {
 
     // Handles reading from and writing to the data file (persistent storage for tasks)
@@ -18,6 +24,15 @@ public class Finch {
     // Handles all user interactions (messages, input prompts, error messages)
     private final Ui ui;
 
+    /**
+     * Constructs a Finch application instance.
+     *
+     * <p>This constructor initializes the {@link Ui}, loads tasks from the
+     * specified file path using {@link Storage}, and handles any errors
+     * gracefully if storage cannot be initialized.
+     *
+     * @param filePath the path to the data file where tasks are stored
+     */
     public Finch(String filePath) {
         this.ui = new Ui();
         Storage tempStorage;
@@ -39,7 +54,14 @@ public class Finch {
         this.tasks = loadedTasks;
     }
 
-
+    /**
+     * Starts the Finch application, displaying a welcome message and
+     * entering the main command loop.
+     *
+     * <p>This method continuously reads user input, parses it into commands,
+     * executes them, and handles exceptions. The loop exits when the user
+     * enters the "bye" command.
+     */
     public void run() {
         ui.showWelcomeMessage();
         boolean isExit = false;
@@ -68,7 +90,11 @@ public class Finch {
         }
     }
 
-    // Main entry point for the Finch application
+    /**
+     * The main entry point for the Finch application.
+     *
+     * @param args command-line arguments (not used)
+     */
     public static void main(String[] args) {
         new Finch("data/tasks.txt").run();
     }

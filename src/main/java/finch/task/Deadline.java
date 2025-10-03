@@ -5,9 +5,17 @@ import finch.exception.FinchException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Represents a Deadline task in the Finch task manager.
+ * <p>
+ * A {@code Deadline} is a task with a description and a specific due date/time.
+ * It can be marked as done/undone, displayed in user-friendly format, or encoded
+ * for persistent storage.
+ */
 public class Deadline extends Task {
 
     private final LocalDateTime by; // store date + time
+
     private static final DateTimeFormatter DISPLAY_FORMATTER =
             DateTimeFormatter.ofPattern("MMM d yyyy, h:mm a");
     // Example: Sep 26 2025, 6:30 PM

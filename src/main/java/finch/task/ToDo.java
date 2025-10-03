@@ -1,5 +1,12 @@
 package finch.task;
 
+/**
+ * Represents a ToDo task in the Finch task manager.
+ * <p>
+ * A {@code ToDo} is a basic task with only a description and no associated time.
+ * It can be marked as done/undone, displayed in user-friendly format, or encoded
+ * for persistent storage.
+ */
 public class ToDo extends Task {
     public ToDo(String description) {
         super(description);

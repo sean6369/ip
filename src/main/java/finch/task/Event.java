@@ -5,10 +5,22 @@ import finch.exception.FinchException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Represents an Event task in the Finch task manager.
+ * <p>
+ * An {@code Event} is a task that occurs within a specific time period,
+ * defined by a start date/time and an end date/time. It can be marked
+ * as done/undone, displayed in a human-readable format, or encoded
+ * for persistent storage.
+ */
 public class Event extends Task {
 
+    // Start date and time of the event
     private final LocalDateTime from;
+
+    // End date and time of the event
     private final LocalDateTime to;
+
     private static final DateTimeFormatter DISPLAY_FORMATTER =
             DateTimeFormatter.ofPattern("MMM d yyyy, h:mm a");
     // Example: Sep 26 2025, 2:00pm

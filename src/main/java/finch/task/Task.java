@@ -5,6 +5,13 @@ import finch.exception.FinchException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 
+/**
+ * Represents an abstract task in the Finch application.
+ * <p>
+ * A task has a description and a completion status (done or not done).
+ * Subclasses ({@link ToDo}, {@link Deadline}, {@link Event}) define
+ * specific types of tasks with additional attributes (e.g., deadlines or event times).
+ */
 public abstract class Task {
 
     // The task description provided by the user
@@ -13,13 +20,22 @@ public abstract class Task {
     // Boolean flag indicating whether the task is done
     protected boolean isDone;
 
-    // Constructs a new task with the given description and the task is initially not done
+    /**
+     * Constructs a new {@code Task} with the given description.
+     * The task is initially marked as not done.
+     *
+     * @param description the description of the task
+     */
     public Task(String description) {
         this.description = description;
         this.isDone = false;
     }
 
-    // Returns the status icon for the task, "X" for done, " " (space) for not done
+    /**
+     * Returns the status icon of the task.
+     *
+     * @return "X" if the task is done, or a single space (" ") if it is not done
+     */
     public String getStatusIcon() {
         return (isDone ? "X" : " "); // mark done task with X
     }
@@ -34,10 +50,29 @@ public abstract class Task {
         isDone = false;
     }
 
-    // Encodes the task into a string format suitable for saving to file
+    /**
+     * Encodes this task into a string representation suitable for saving to file.
+     * <p>
+     * Implemented by subclasses to provide their own save format.
+     *
+     * @return a string representation of the task for storage
+     */
     public abstract String encode();
 
-    // Decodes a line from a saved file and returns the corresponding Task object
+    /**
+     * Decodes a task from a saved file line into the corresponding {@link Task} object.
+     * <p>
+     * Supports the following formats:
+     * <ul>
+     *     <li>ToDo: {@code T | isDone | description}</li>
+     *     <li>Deadline: {@code D | isDone | description | yyyy-MM-ddTHH:mm}</li>
+     *     <li>Event: {@code E | isDone | description | startDateTime | endDateTime}</li>
+     * </ul>
+     *
+     * @param line the encoded task string read from storage
+     * @return the corresponding {@link Task} object
+     * @throws FinchException if the task type is unknown or the date format is invalid
+     */
     public static Task decode(String line) throws FinchException {
         String[] parts = line.split(" \\| ");
         String type = parts[0];
@@ -73,12 +108,22 @@ public abstract class Task {
         return task;
     }
 
-    // Returns a string representation of the task, including the status icon and description
+    /**
+     * Returns a string representation of this task for display purposes.
+     *
+     * @return a string containing the status icon and task description
+     */
     @Override
     public String toString() {
         return "[" + getStatusIcon() + "] " + description;
     }
 
-    // Converts the task into a format suitable for saving in a file
+    /**
+     * Converts this task into a saveable format for persistent storage.
+     * <p>
+     * Implemented by subclasses to define their own file format.
+     *
+     * @return a string representation of the task suitable for storage
+     */
     public abstract String toSaveFormat();
 }
